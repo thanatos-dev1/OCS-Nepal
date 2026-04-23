@@ -55,7 +55,7 @@ export default function Navbar() {
 
   return (
     <>
-      <header className="sticky top-0 z-50 bg-white border-b border-border shadow-sm">
+      <header className="sticky top-0 z-navbar bg-white border-b border-border shadow-sm">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex items-center justify-between h-16 gap-4">
             {/* Logo */}
@@ -104,6 +104,13 @@ export default function Navbar() {
                   placeholder="Search products..."
                   className="flex-1 h-9 px-3 text-sm bg-bg-subtle border border-border rounded-md outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-colors"
                 />
+                <button
+                  type="submit"
+                  className="p-1.5 text-text-muted hover:text-primary transition-colors"
+                  aria-label="Submit search"
+                >
+                  <Search size={18} />
+                </button>
                 <button
                   type="button"
                   onClick={closeSearch}
@@ -157,14 +164,21 @@ export default function Navbar() {
 
           {/* Mobile search bar */}
           {searchOpen && (
-            <form onSubmit={handleSearchSubmit} className="md:hidden pb-3">
+            <form onSubmit={handleSearchSubmit} className="md:hidden pb-3 flex gap-2">
               <input
                 type="text"
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
                 placeholder="Search products..."
-                className="w-full h-9 px-3 text-sm bg-bg-subtle border border-border rounded-md outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-colors"
+                className="flex-1 h-9 px-3 text-sm bg-bg-subtle border border-border rounded-md outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-colors"
               />
+              <button
+                type="submit"
+                className="p-1.5 text-text-muted hover:text-primary transition-colors"
+                aria-label="Submit search"
+              >
+                <Search size={18} />
+              </button>
             </form>
           )}
         </div>

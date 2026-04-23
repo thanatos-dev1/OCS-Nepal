@@ -28,7 +28,13 @@ export default function ProductCard({
     e.preventDefault();
     e.stopPropagation();
     if (!product.inStock) return;
-    addItem({ id: product.id, name: product.name, price: product.price });
+    addItem({
+      id: product.id,
+      name: product.name,
+      price: product.price,
+      image: product.images?.[0],
+      category: product.category,
+    });
     setAdded(true);
     setTimeout(() => setAdded(false), 1500);
   }
@@ -38,7 +44,7 @@ export default function ProductCard({
       href={`/products/${product.id}`}
       className="group bg-bg-card border border-border rounded-xl overflow-hidden hover:shadow-card hover:border-border-strong transition-all"
     >
-      <div className="relative h-44 overflow-hidden ">
+      <div className="relative h-44 overflow-hidden pt-2 ble">
         <ProductImage
           src={product.images?.[0]}
           alt={product.name}
