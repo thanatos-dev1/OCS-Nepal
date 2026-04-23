@@ -4,6 +4,7 @@ import Link from "next/link";
 import { Trash2, ShoppingBag, Minus, Plus } from "lucide-react";
 import { useCartStore } from "@/stores/cartStore";
 import Button from "@/components/ui/Button";
+import ProductImage from "@/components/shop/ProductImage";
 
 function formatNPR(amount: number) {
   return `NPR ${amount.toLocaleString("en-NP")}`;
@@ -20,7 +21,9 @@ export default function CartPage() {
         <ShoppingBag size={56} className="text-border-strong" />
         <div className="text-center">
           <p className="text-lg font-semibold text-text">Your cart is empty</p>
-          <p className="mt-1 text-sm text-text-muted">Add some products to get started.</p>
+          <p className="mt-1 text-sm text-text-muted">
+            Add some products to get started.
+          </p>
         </div>
         <Link href="/products">
           <Button variant="primary">Browse Products</Button>
@@ -41,9 +44,13 @@ export default function CartPage() {
               key={item.id}
               className="flex items-center gap-4 bg-bg-card border border-border rounded-xl p-4"
             >
-              {/* Thumbnail placeholder */}
-              <div className="w-16 h-16 shrink-0 rounded-lg bg-bg-subtle border border-border flex items-center justify-center">
-                <ShoppingBag size={20} className="text-text-disabled" />
+              {/* Thumbnail */}
+              <div className="w-16 h-16 shrink-0 rounded-lg overflow-hidden border border-border">
+                <ProductImage
+                  src={item.image}
+                  alt={item.name}
+                  category={item.category}
+                />
               </div>
 
               {/* Name + price */}
@@ -107,15 +114,23 @@ export default function CartPage() {
         {/* Order summary */}
         <div className="lg:w-72 shrink-0">
           <div className="bg-bg-card border border-border rounded-xl p-5 sticky top-24">
-            <h2 className="text-base font-semibold text-text mb-4">Order Summary</h2>
+            <h2 className="text-base font-semibold text-text mb-4">
+              Order Summary
+            </h2>
 
             <div className="flex justify-between text-sm text-text-muted mb-2">
-              <span>Subtotal ({items.reduce((n, i) => n + i.qty, 0)} items)</span>
-              <span className="text-text font-medium">{formatNPR(subtotal)}</span>
+              <span>
+                Subtotal ({items.reduce((n, i) => n + i.qty, 0)} items)
+              </span>
+              <span className="text-text font-medium">
+                {formatNPR(subtotal)}
+              </span>
             </div>
             <div className="flex justify-between text-sm text-text-muted mb-4">
               <span>Shipping</span>
-              <span className="text-text font-medium">Calculated at checkout</span>
+              <span className="text-text font-medium">
+                Calculated at checkout
+              </span>
             </div>
 
             <div className="border-t border-border pt-4 flex justify-between font-bold text-text mb-5">

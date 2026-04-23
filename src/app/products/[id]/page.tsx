@@ -1,15 +1,19 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { ShieldCheck, Truck, RotateCcw, ChevronRight } from "lucide-react";
-import Button from "@/components/ui/Button";
 import ProductImage from "@/components/shop/ProductImage";
+import AddToCartButton from "@/components/shop/AddToCartButton";
 import { getProductById } from "@/lib/api/products";
 
 function formatNPR(amount: number) {
   return `NPR ${amount.toLocaleString("en-NP")}`;
 }
 
-export default async function ProductPage({ params }: { params: Promise<{ id: string }> }) {
+export default async function ProductPage({
+  params,
+}: {
+  params: Promise<{ id: string }>;
+}) {
   const { id } = await params;
   const product = await getProductById(id);
 
@@ -19,15 +23,24 @@ export default async function ProductPage({ params }: { params: Promise<{ id: st
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
       {/* Breadcrumb */}
       <nav className="flex items-center gap-1.5 text-sm text-text-muted mb-8">
-        <Link href="/" className="hover:text-primary transition-colors">Home</Link>
+        <Link href="/" className="hover:text-primary transition-colors">
+          Home
+        </Link>
         <ChevronRight size={14} />
-        <Link href="/products" className="hover:text-primary transition-colors">Products</Link>
+        <Link href="/products" className="hover:text-primary transition-colors">
+          Products
+        </Link>
         <ChevronRight size={14} />
-        <Link href={`/categories/${product.categorySlug}`} className="hover:text-primary transition-colors">
+        <Link
+          href={`/categories/${product.categorySlug}`}
+          className="hover:text-primary transition-colors"
+        >
           {product.category}
         </Link>
         <ChevronRight size={14} />
-        <span className="text-text font-medium truncate max-w-50">{product.name}</span>
+        <span className="text-text font-medium truncate max-w-50">
+          {product.name}
+        </span>
       </nav>
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-10 lg:gap-16">
@@ -48,7 +61,11 @@ export default async function ProductPage({ params }: { params: Promise<{ id: st
                   key={i}
                   className="aspect-square rounded-lg overflow-hidden border-2 border-transparent hover:border-primary transition-colors cursor-pointer"
                 >
-                  <ProductImage src={img} alt={`${product.name} view ${i + 1}`} category={product.category} />
+                  <ProductImage
+                    src={img}
+                    alt={`${product.name} view ${i + 1}`}
+                    category={product.category}
+                  />
                 </div>
               ))}
             </div>
@@ -65,7 +82,9 @@ export default async function ProductPage({ params }: { params: Promise<{ id: st
           </h1>
 
           <div className="mt-5">
-            <span className="text-3xl font-bold text-text">{formatNPR(product.price)}</span>
+            <span className="text-3xl font-bold text-text">
+              {formatNPR(product.price)}
+            </span>
           </div>
 
           <div className="mt-3">
@@ -74,7 +93,9 @@ export default async function ProductPage({ params }: { params: Promise<{ id: st
                 <span className="w-2 h-2 rounded-full bg-success inline-block" />
                 In Stock
                 {product.stockCount <= 10 && (
-                  <span className="text-text-disabled font-normal">· Only {product.stockCount} left</span>
+                  <span className="text-text-disabled font-normal">
+                    · Only {product.stockCount} left
+                  </span>
                 )}
               </span>
             ) : (
@@ -85,12 +106,12 @@ export default async function ProductPage({ params }: { params: Promise<{ id: st
             )}
           </div>
 
-          <p className="mt-6 text-text-muted leading-relaxed text-sm">{product.description}</p>
+          <p className="mt-6 text-text-muted leading-relaxed text-sm">
+            {product.description}
+          </p>
 
           <div className="mt-8 flex gap-3">
-            <Button variant="cta" size="lg" className="flex-1" disabled={!product.inStock}>
-              {product.inStock ? "Add to Cart" : "Out of Stock"}
-            </Button>
+            <AddToCartButton product={product} />
           </div>
 
           {/* Trust badges */}
@@ -120,7 +141,9 @@ export default async function ProductPage({ params }: { params: Promise<{ id: st
               key={spec.label}
               className={`flex items-center px-5 py-3.5 text-sm ${i % 2 === 0 ? "bg-bg-card" : "bg-bg-subtle"}`}
             >
-              <span className="w-40 font-medium text-text-muted shrink-0">{spec.label}</span>
+              <span className="w-40 font-medium text-text-muted shrink-0">
+                {spec.label}
+              </span>
               <span className="text-text">{spec.value}</span>
             </div>
           ))}

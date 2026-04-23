@@ -24,7 +24,6 @@ export default function RootLayout({
     <html lang="en" className={`${geist.variable} h-full antialiased`}>
       <body className="min-h-full flex flex-col bg-bg text-slate-900 font-sans">
         <Navbar />
-        <span className="bg-red-300 absolute z-10">sdfsdf</span>
 
         <main className="flex-1">{children}</main>
         <Footer />
