@@ -1,0 +1,18 @@
+export const queryKeys = {
+  products: ["products"] as const,
+  product: (id: string) => ["products", id] as const,
+  categories: ["categories"] as const,
+  cart: ["cart"] as const,
+  profile: ["profile"] as const,
+  orders: ["orders"] as const,
+  order: (id: string) => ["orders", id] as const,
+  allOrders: ["allOrders"] as const,
+  featuredProducts: ["featuredProducts"] as const,
+  offers: ["offers"] as const,
+  offer: (id: string) => ["offers", id] as const,
+  coupons: ["coupons"] as const,
+  coupon: (id: string) => ["coupons", id] as const,
+  customers: ["customers"] as const,
+  customer: (id: string) => ["customers", id] as const,
+  customerOrders: (id: string) => ["customers", id, "orders"] as const,
+};

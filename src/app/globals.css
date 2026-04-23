@@ -1,0 +1,80 @@
+@import "tailwindcss";
+
+@theme {
+  /* ─── Brand: Primary (Deep Slate) ──────────────────────── */
+  --color-primary: #0f172a;
+  --color-primary-hover: #1e293b;
+  --color-primary-active: #334155;
+  --color-primary-light: #f1f5f9;
+
+  /* ─── Brand: Accent (Orange) ────────────────────────────── */
+  --color-accent: #f97316;
+  --color-accent-hover: #ea580c;
+  --color-accent-active: #c2410c;
+  --color-accent-light: #ffedd5;
+
+  /* ─── Backgrounds ───────────────────────────────────────── */
+  --color-bg: #ffffff; /* page background       */
+  --color-bg-subtle: #f8fafc; /* section / stripe bg   */
+  --color-bg-card: #ffffff; /* card / panel bg       */
+
+  /* ─── Text ──────────────────────────────────────────────── */
+  --color-text: #0f172a; /* headings, body        */
+  --color-text-muted: #64748b; /* secondary labels      */
+  --color-text-disabled: #94a3b8; /* disabled / placeholder */
+
+  /* ─── Borders ───────────────────────────────────────────── */
+  --color-border: #e2e8f0; /* default border        */
+  --color-border-strong: #cbd5e1; /* emphasized border     */
+
+  /* ─── Status ────────────────────────────────────────────── */
+  --color-success: #059669;
+  --color-success-light: #d1fae5;
+  --color-error: #dc2626;
+  --color-error-light: #fee2e2;
+  --color-warning: #d97706;
+  --color-warning-light: #fef3c7;
+
+  /* ─── Border Radius ─────────────────────────────────────── */
+  --radius-sm: 4px; /* badges, tags                      */
+  --radius-md: 8px; /* buttons, inputs                   */
+  --radius-lg: 12px; /* cards, panels                     */
+  --radius-xl: 16px; /* modals, large cards               */
+  --radius-full: 9999px; /* pills, avatars                    */
+
+  /* ─── Shadows ───────────────────────────────────────────── */
+  --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+  --shadow-md:
+    0 4px 6px -1px rgb(0 0 0 / 0.07), 0 2px 4px -2px rgb(0 0 0 / 0.05);
+  --shadow-lg:
+    0 10px 15px -3px rgb(0 0 0 / 0.08), 0 4px 6px -4px rgb(0 0 0 / 0.05);
+  --shadow-card: 0 2px 8px 0 rgb(0 0 0 / 0.06);
+
+  /* ─── Z-index Layers ─────────────────────────────────────── */
+  --z-index-base: 0;
+  --z-index-raised: 10; /* dropdowns, tooltips                 */
+  --z-index-sticky: 40; /* sticky sidebar                      */
+  --z-index-navbar: 50; /* top navbar                          */
+  --z-index-overlay: 60; /* modal backdrop                      */
+  --z-index-modal: 70; /* modal panel                         */
+  --z-index-toast: 80; /* toast notifications                 */
+
+  /* ─── Typography ────────────────────────────────────────── */
+  --font-sans: var(--font-geist-sans);
+}
+
+body {
+  background: var(--color-bg);
+  color: var(--color-text);
+  font-family: var(--font-sans), system-ui, sans-serif;
+}
+
+@keyframes marquee {
+  from { transform: translateX(0); }
+  to   { transform: translateX(-50%); }
+}
+
+@utility animate-marquee {
+  animation: marquee 60s linear infinite;
+  width: max-content;
+}
