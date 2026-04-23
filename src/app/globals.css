@@ -1,26 +1,68 @@
 @import "tailwindcss";
 
-:root {
-  --background: #ffffff;
-  --foreground: #171717;
-}
+@theme {
+  /* ─── Brand: Primary (Deep Slate) ──────────────────────── */
+  --color-primary:        #0F172A;
+  --color-primary-hover:  #1E293B;
+  --color-primary-active: #334155;
+  --color-primary-light:  #F1F5F9;
 
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
+  /* ─── Brand: Accent (Orange) ────────────────────────────── */
+  --color-accent:         #F97316;
+  --color-accent-hover:   #EA580C;
+  --color-accent-active:  #C2410C;
+  --color-accent-light:   #FFEDD5;
+
+  /* ─── Backgrounds ───────────────────────────────────────── */
+  --color-bg:             #FFFFFF;   /* page background       */
+  --color-bg-subtle:      #F8FAFC;   /* section / stripe bg   */
+  --color-bg-card:        #FFFFFF;   /* card / panel bg       */
+
+  /* ─── Text ──────────────────────────────────────────────── */
+  --color-text:           #0F172A;   /* headings, body        */
+  --color-text-muted:     #64748B;   /* secondary labels      */
+  --color-text-disabled:  #94A3B8;   /* disabled / placeholder */
+
+  /* ─── Borders ───────────────────────────────────────────── */
+  --color-border:         #E2E8F0;   /* default border        */
+  --color-border-strong:  #CBD5E1;   /* emphasized border     */
+
+  /* ─── Status ────────────────────────────────────────────── */
+  --color-success:        #059669;
+  --color-success-light:  #D1FAE5;
+  --color-error:          #DC2626;
+  --color-error-light:    #FEE2E2;
+  --color-warning:        #D97706;
+  --color-warning-light:  #FEF3C7;
+
+  /* ─── Border Radius ─────────────────────────────────────── */
+  --radius-sm:   4px;    /* badges, tags                      */
+  --radius-md:   8px;    /* buttons, inputs                   */
+  --radius-lg:   12px;   /* cards, panels                     */
+  --radius-xl:   16px;   /* modals, large cards               */
+  --radius-full: 9999px; /* pills, avatars                    */
+
+  /* ─── Shadows ───────────────────────────────────────────── */
+  --shadow-sm:   0 1px 2px 0 rgb(0 0 0 / 0.05);
+  --shadow-md:   0 4px 6px -1px rgb(0 0 0 / 0.07), 0 2px 4px -2px rgb(0 0 0 / 0.05);
+  --shadow-lg:   0 10px 15px -3px rgb(0 0 0 / 0.08), 0 4px 6px -4px rgb(0 0 0 / 0.05);
+  --shadow-card: 0 2px 8px 0 rgb(0 0 0 / 0.06);
+
+  /* ─── Z-index Layers ─────────────────────────────────────── */
+  --z-base:     0;
+  --z-raised:   10;    /* dropdowns, tooltips                 */
+  --z-sticky:   40;    /* sticky sidebar                      */
+  --z-navbar:   50;    /* top navbar                          */
+  --z-overlay:  60;    /* modal backdrop                      */
+  --z-modal:    70;    /* modal panel                         */
+  --z-toast:    80;    /* toast notifications                 */
+
+  /* ─── Typography ────────────────────────────────────────── */
   --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
-}
-
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
 }
 
 body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  background: var(--color-bg);
+  color: var(--color-text);
+  font-family: var(--font-sans), system-ui, sans-serif;
 }

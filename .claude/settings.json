@@ -1,0 +1,15 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(yarn build *)",
+      "WebFetch(domain:unsplash.com)",
+      "WebSearch"
+    ],
+    "additionalDirectories": [
+      "/home/thanatos/Work/ocs-nepal-frontend/src/app/products"
+    ]
+  },
+  "enabledPlugins": {
+    "claude-md-management@claude-plugins-official": true
+  }
+}
