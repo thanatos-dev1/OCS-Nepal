@@ -3,6 +3,7 @@
 import { useState } from "react";
 import Link from "next/link";
 import Button from "@/components/ui/Button";
+import Badge from "@/components/ui/Badge";
 import ProductImage from "@/components/shop/ProductImage";
 import { cn } from "@/lib/utils";
 import type { Product } from "@/lib/api/types";
@@ -51,9 +52,7 @@ export default function ProductCard({
           category={product.category}
         />
         {product.badge && (
-          <span className="absolute top-3 left-3 px-2 py-0.5 text-xs font-semibold bg-accent text-white rounded-sm">
-            {product.badge}
-          </span>
+          <Badge label={product.badge} className="absolute top-3 left-3" />
         )}
         {!product.inStock && (
           <span className="absolute top-3 right-3 px-2 py-0.5 text-xs font-semibold bg-bg text-text-disabled border border-border rounded-sm">

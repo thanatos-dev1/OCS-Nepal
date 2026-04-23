@@ -68,3 +68,13 @@ body {
   color: var(--color-text);
   font-family: var(--font-sans), system-ui, sans-serif;
 }
+
+@keyframes marquee {
+  from { transform: translateX(0); }
+  to   { transform: translateX(-50%); }
+}
+
+@utility animate-marquee {
+  animation: marquee 60s linear infinite;
+  width: max-content;
+}
