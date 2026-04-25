@@ -3,9 +3,19 @@
 import { useState, useRef, useEffect } from "react";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
-import { ShoppingCart, Search, Menu, X } from "lucide-react";
+import {
+  ShoppingCart,
+  Search,
+  Menu,
+  X,
+  User,
+  LogOut,
+  LayoutDashboard,
+} from "lucide-react";
 import { cn } from "@/lib/utils";
-import { useCartStore } from "@/stores/cartStore";
+import { useCartQuery } from "@/hooks/useCart";
+import { useAuthStore } from "@/stores/authStore";
+import { logout } from "@/lib/api/auth";
 
 const navLinks = [
   { label: "Products", href: "/products" },
@@ -17,12 +27,18 @@ const navLinks = [
 export default function Navbar() {
   const pathname = usePathname();
   const router = useRouter();
-  const itemCount = useCartStore((s) => s.itemCount);
+  const { data: cartItems } = useCartQuery();
+  const itemCount = cartItems?.reduce((n, i) => n + i.quantity, 0) ?? 0;
+  const user = useAuthStore((s) => s.user);
+  const clear = useAuthStore((s) => s.clear);
 
   const [menuOpen, setMenuOpen] = useState(false);
   const [searchOpen, setSearchOpen] = useState(false);
+  const [loggingOut, setLoggingOut] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
+  const [userMenuOpen, setUserMenuOpen] = useState(false);
   const searchInputRef = useRef<HTMLInputElement>(null);
+  const userMenuRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     if (searchOpen) searchInputRef.current?.focus();
@@ -30,10 +46,26 @@ export default function Navbar() {
 
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => {
-      if (e.key === "Escape") closeSearch();
+      if (e.key === "Escape") {
+        closeSearch();
+        setUserMenuOpen(false);
+      }
     };
     document.addEventListener("keydown", onKey);
     return () => document.removeEventListener("keydown", onKey);
+  }, []);
+
+  useEffect(() => {
+    function handleClickOutside(e: MouseEvent) {
+      if (
+        userMenuRef.current &&
+        !userMenuRef.current.contains(e.target as Node)
+      ) {
+        setUserMenuOpen(false);
+      }
+    }
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
 
   function closeSearch() {
@@ -48,10 +80,24 @@ export default function Navbar() {
     closeSearch();
   }
 
+  async function handleLogout() {
+    setUserMenuOpen(false);
+    setLoggingOut(true);
+    try {
+      await logout();
+    } finally {
+      clear();
+      setLoggingOut(false);
+      router.push("/");
+    }
+  }
+
   function isActive(href: string) {
     if (href === "/") return pathname === "/";
     return pathname === href || pathname.startsWith(href + "/");
   }
+
+  const firstName = user?.name.split(" ")[0] ?? "";
 
   return (
     <>
@@ -72,6 +118,21 @@ export default function Navbar() {
             {/* Desktop nav */}
             {!searchOpen && (
               <nav className="hidden md:flex items-center gap-7">
+                {user?.role === "owner" && (
+                  <Link
+                    href="/dashboard"
+                    className={cn(
+                      "flex items-center gap-1.5 relative text-sm font-medium transition-colors pb-0.5",
+                      "after:absolute after:bottom-0 after:left-0 after:h-0.5 after:w-full after:rounded-full after:bg-accent after:transition-transform after:duration-200",
+                      isActive("/dashboard")
+                        ? "text-primary after:scale-x-100"
+                        : "text-text-muted hover:text-primary after:scale-x-0 hover:after:scale-x-100",
+                    )}
+                  >
+                    <LayoutDashboard size={14} />
+                    Dashboard
+                  </Link>
+                )}
                 {navLinks.map((link) => (
                   <Link
                     key={link.href}
@@ -145,12 +206,45 @@ export default function Navbar() {
                 )}
               </Link>
 
-              <Link
-                href="/account/login"
-                className="hidden md:inline-flex items-center px-4 py-2 text-sm font-medium text-white bg-primary rounded-md hover:bg-primary-hover active:bg-primary-active transition-colors"
-              >
-                Sign In
-              </Link>
+              {/* Auth — desktop */}
+              {user ? (
+                <div className="hidden md:block relative" ref={userMenuRef}>
+                  <button
+                    onClick={() => setUserMenuOpen((v) => !v)}
+                    className="flex items-center gap-1.5 px-3 py-1.5 text-sm font-medium text-primary rounded-md hover:bg-bg-subtle transition-colors"
+                  >
+                    <User size={16} />
+                    {firstName}
+                  </button>
+                  {userMenuOpen && (
+                    <div className="absolute right-0 top-full mt-1 w-44 bg-white border border-border rounded-lg shadow-lg py-1 z-modal">
+                      <Link
+                        href={user.role === "owner" ? "/dashboard" : "/account"}
+                        className="flex items-center gap-2 px-4 py-2.5 text-sm text-text hover:bg-bg-subtle transition-colors"
+                        onClick={() => setUserMenuOpen(false)}
+                      >
+                        <User size={14} />
+                        {user.role === "owner" ? "Dashboard" : "My Account"}
+                      </Link>
+                      <button
+                        onClick={handleLogout}
+                        disabled={loggingOut}
+                        className="w-full flex items-center gap-2 px-4 py-2.5 text-sm text-error hover:bg-error-light transition-colors disabled:opacity-50"
+                      >
+                        <LogOut size={14} />
+                        {loggingOut ? "Signing out…" : "Sign Out"}
+                      </button>
+                    </div>
+                  )}
+                </div>
+              ) : (
+                <Link
+                  href="/account/login"
+                  className="hidden md:inline-flex items-center px-4 py-2 text-sm font-medium text-white bg-primary rounded-md hover:bg-primary-hover active:bg-primary-active transition-colors"
+                >
+                  Sign In
+                </Link>
+              )}
 
               <button
                 className="md:hidden p-2 text-text-muted hover:text-primary transition-colors"
@@ -164,7 +258,10 @@ export default function Navbar() {
 
           {/* Mobile search bar */}
           {searchOpen && (
-            <form onSubmit={handleSearchSubmit} className="md:hidden pb-3 flex gap-2">
+            <form
+              onSubmit={handleSearchSubmit}
+              className="md:hidden pb-3 flex gap-2"
+            >
               <input
                 type="text"
                 value={searchQuery}
@@ -193,6 +290,21 @@ export default function Navbar() {
           />
           <div className="fixed top-16 left-0 right-0 z-modal bg-white border-b border-border shadow-lg md:hidden">
             <nav className="max-w-7xl mx-auto px-4 py-4 flex flex-col gap-1">
+              {user?.role === "owner" && (
+                <Link
+                  href="/dashboard"
+                  className={cn(
+                    "flex items-center gap-2 px-3 py-3 text-base font-medium rounded-lg transition-colors",
+                    isActive("/dashboard")
+                      ? "text-primary bg-primary-light"
+                      : "text-text hover:text-primary hover:bg-bg-subtle",
+                  )}
+                  onClick={() => setMenuOpen(false)}
+                >
+                  <LayoutDashboard size={18} />
+                  Dashboard
+                </Link>
+              )}
               {navLinks.map((link) => (
                 <Link
                   key={link.href}
@@ -208,14 +320,35 @@ export default function Navbar() {
                   {link.label}
                 </Link>
               ))}
-              <div className="mt-3 pt-3 border-t border-border">
-                <Link
-                  href="/account/login"
-                  className="flex items-center justify-center px-4 py-3 text-sm font-semibold text-white bg-primary rounded-md hover:bg-primary-hover transition-colors"
-                  onClick={() => setMenuOpen(false)}
-                >
-                  Sign In
-                </Link>
+              <div className="mt-3 pt-3 border-t border-border flex flex-col gap-2">
+                {user ? (
+                  <>
+                    <Link
+                      href={user.role === "owner" ? "/dashboard" : "/account"}
+                      className="flex items-center gap-2 px-3 py-3 text-base font-medium text-text rounded-lg hover:bg-bg-subtle transition-colors"
+                      onClick={() => setMenuOpen(false)}
+                    >
+                      <User size={18} />
+                      {user.role === "owner" ? "Dashboard" : user.name}
+                    </Link>
+                    <button
+                      onClick={() => { setMenuOpen(false); handleLogout(); }}
+                      disabled={loggingOut}
+                      className="flex items-center gap-2 px-3 py-3 text-base font-medium text-error rounded-lg hover:bg-error-light transition-colors disabled:opacity-50"
+                    >
+                      <LogOut size={18} />
+                      {loggingOut ? "Signing out…" : "Sign Out"}
+                    </button>
+                  </>
+                ) : (
+                  <Link
+                    href="/account/login"
+                    className="flex items-center justify-center px-4 py-3 text-sm font-semibold text-white bg-primary rounded-md hover:bg-primary-hover transition-colors"
+                    onClick={() => setMenuOpen(false)}
+                  >
+                    Sign In
+                  </Link>
+                )}
               </div>
             </nav>
           </div>

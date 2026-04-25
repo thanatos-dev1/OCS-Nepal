@@ -1,12 +1,15 @@
 "use client";
 
 import { useState } from "react";
+import { useRouter } from "next/navigation";
 import Link from "next/link";
 import Button from "@/components/ui/Button";
+import Badge from "@/components/ui/Badge";
 import ProductImage from "@/components/shop/ProductImage";
 import { cn } from "@/lib/utils";
 import type { Product } from "@/lib/api/types";
-import { useCartStore } from "@/stores/cartStore";
+import { useAddToCartMutation } from "@/hooks/useCart";
+import { useAuthStore } from "@/stores/authStore";
 
 function formatNPR(amount: number) {
   return `NPR ${amount.toLocaleString("en-NP")}`;
@@ -17,26 +20,26 @@ interface ProductCardProps {
   showCategory?: boolean;
 }
 
-export default function ProductCard({
-  product,
-  showCategory = true,
-}: ProductCardProps) {
-  const addItem = useCartStore((s) => s.addItem);
+export default function ProductCard({ product, showCategory = true }: ProductCardProps) {
+  const router = useRouter();
+  const token = useAuthStore((s) => s.token);
+  const addToCart = useAddToCartMutation();
   const [added, setAdded] = useState(false);
 
   function handleAddToCart(e: React.MouseEvent) {
     e.preventDefault();
     e.stopPropagation();
     if (!product.inStock) return;
-    addItem({
-      id: product.id,
-      name: product.name,
-      price: product.price,
-      image: product.images?.[0],
-      category: product.category,
-    });
-    setAdded(true);
-    setTimeout(() => setAdded(false), 1500);
+    if (!token) { router.push("/account/login"); return; }
+    addToCart.mutate(
+      { productId: parseInt(product.id, 10), quantity: 1 },
+      {
+        onSuccess: () => {
+          setAdded(true);
+          setTimeout(() => setAdded(false), 1500);
+        },
+      }
+    );
   }
 
   return (
@@ -51,9 +54,7 @@ export default function ProductCard({
           category={product.category}
         />
         {product.badge && (
-          <span className="absolute top-3 left-3 px-2 py-0.5 text-xs font-semibold bg-accent text-white rounded-sm">
-            {product.badge}
-          </span>
+          <Badge label={product.badge} className="absolute top-3 left-3" />
         )}
         {!product.inStock && (
           <span className="absolute top-3 right-3 px-2 py-0.5 text-xs font-semibold bg-bg text-text-disabled border border-border rounded-sm">
@@ -67,19 +68,12 @@ export default function ProductCard({
             {product.category}
           </p>
         )}
-        <h3
-          className={cn(
-            "text-sm font-semibold leading-snug transition-colors text-text group-hover:text-primary",
-            !showCategory && "mt-0",
-          )}
-        >
+        <h3 className={cn("text-sm font-semibold leading-snug transition-colors text-text group-hover:text-primary", !showCategory && "mt-0")}>
           {product.name}
         </h3>
-        <p className="mt-3 text-base font-bold text-text">
-          {formatNPR(product.price)}
-        </p>
+        <p className="mt-3 text-base font-bold text-text">{formatNPR(product.price)}</p>
         <Button
-          variant={"cta"}
+          variant="cta"
           size="sm"
           className="mt-3 w-full"
           disabled={!product.inStock}

@@ -1,18 +1,56 @@
 import type { Product } from "./types";
-import { MOCK_PRODUCTS } from "./mock/products";
+import api from "./client";
 
-export async function getProducts(params?: {
-  q?: string;
-  category?: string;
-  minPrice?: number;
-  maxPrice?: number;
-  sort?: string;
-}): Promise<Product[]> {
-  // TODO: replace with axios call when backend is ready
-  // return api.get("/products", { params }).then((r) => r.data);
+// Shape returned by the Go API (PascalCase GORM model)
+type ApiProduct = {
+  ID: number;
+  Name: string;
+  Price: number;
+  Brand?: string;
+  CategoryID?: number;
+  Description?: string;
+  ImageURL?: string;
+  Stock?: number;
+  Category?: { ID: number; Name: string };
+};
 
-  let results = [...MOCK_PRODUCTS];
+export type ProductInput = {
+  name: string;
+  price: number;
+  description?: string;
+  stock?: number;
+  brand?: string;
+  image_url?: string;
+  category_id?: number;
+};
 
+function toSlug(name: string) {
+  return name.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/(^-|-$)/g, "");
+}
+
+function adaptProduct(p: ApiProduct): Product {
+  return {
+    id: String(p.ID),
+    name: p.Name,
+    slug: toSlug(p.Name),
+    price: p.Price,
+    brand: p.Brand,
+    description: p.Description ?? "",
+    images: p.ImageURL ? [p.ImageURL] : [],
+    inStock: (p.Stock ?? 0) > 0,
+    stockCount: p.Stock ?? 0,
+    categoryId: String(p.CategoryID ?? ""),
+    category: p.Category?.Name ?? "",
+    categorySlug: p.Category ? toSlug(p.Category.Name) : "",
+    specs: [],
+  };
+}
+
+function applyFilters(
+  products: Product[],
+  params?: { q?: string; category?: string; minPrice?: number; maxPrice?: number; sort?: string }
+): Product[] {
+  let results = [...products];
   if (params?.q) {
     const q = params.q.toLowerCase();
     results = results.filter((p) => p.name.toLowerCase().includes(q));
@@ -26,22 +64,53 @@ export async function getProducts(params?: {
   if (params?.maxPrice !== undefined) {
     results = results.filter((p) => p.price <= params.maxPrice!);
   }
-  if (params?.sort === "price_asc")  results.sort((a, b) => a.price - b.price);
+  if (params?.sort === "price_asc") results.sort((a, b) => a.price - b.price);
   if (params?.sort === "price_desc") results.sort((a, b) => b.price - a.price);
-
   return results;
 }
 
-export async function getProductById(id: string): Promise<Product | null> {
-  // TODO: replace with axios call when backend is ready
-  // return api.get(`/products/${id}`).then((r) => r.data);
+export async function getProducts(params?: {
+  q?: string;
+  category?: string;
+  minPrice?: number;
+  maxPrice?: number;
+  sort?: string;
+}): Promise<Product[]> {
+  const { data } = await api.get<ApiProduct[]>("/products");
+  const products = Array.isArray(data) ? data.map(adaptProduct) : [];
+  return applyFilters(products, params);
+}
 
-  return MOCK_PRODUCTS.find((p) => p.id === id) ?? null;
+export async function getProductById(id: string): Promise<Product | null> {
+  const { data } = await api.get<ApiProduct>(`/products/${parseInt(id, 10)}`);
+  return adaptProduct(data);
 }
 
 export async function getFeaturedProducts(): Promise<Product[]> {
-  // TODO: replace with axios call when backend is ready
-  // return api.get("/products/featured").then((r) => r.data);
+  const products = await getProducts();
+  const featured = products.filter((p) => p.badge === "Popular" || p.badge === "New");
+  return (featured.length > 0 ? featured : products).slice(0, 4);
+}
 
-  return MOCK_PRODUCTS.filter((p) => p.badge === "Popular" || p.badge === "New").slice(0, 4);
+// --- Owner endpoints ---
+
+export async function createProduct(input: ProductInput): Promise<Product> {
+  const { data } = await api.post<ApiProduct>("/products", input);
+  return adaptProduct(data);
+}
+
+export async function createProductWithImage(form: FormData): Promise<Product> {
+  const { data } = await api.post<ApiProduct>("/products/with-image", form, {
+    headers: { "Content-Type": "multipart/form-data" },
+  });
+  return adaptProduct(data);
+}
+
+export async function updateProduct(id: number, input: ProductInput): Promise<Product> {
+  const { data } = await api.put<ApiProduct>(`/products/${id}`, input);
+  return adaptProduct(data);
+}
+
+export async function deleteProduct(id: number): Promise<void> {
+  await api.delete(`/products/${id}`);
 }

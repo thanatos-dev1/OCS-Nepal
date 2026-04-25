@@ -3,7 +3,14 @@
     "allow": [
       "Bash(yarn build *)",
       "WebFetch(domain:unsplash.com)",
-      "WebSearch"
+      "WebSearch",
+      "WebFetch(domain:ocs-nepal-backend-production.up.railway.app)",
+      "Bash(xargs ls *)",
+      "Bash(xargs cat *)",
+      "Bash(curl -s -X POST https://ocs-nepal-backend-production.up.railway.app/api/v1/auth/register -H 'Content-Type: application/json' -d '{\"email\":\"test@test.com\",\"name\":\"Test User\",\"password\":\"password123\"}')",
+      "Bash(curl -s https://ocs-nepal-backend-production.up.railway.app/api/v1/me -H 'Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjoxLCJyb2xlIjoiY3VzdG9tZXIiLCJleHAiOjE3NzcwOTY2NTZ9.AEYLwKzTpDX3pybGhbZkGO79JDmhYt1Nkf2waz_X8fg')",
+      "Bash(yarn tsc *)",
+      "Bash(curl -s -X POST https://ocs-nepal-backend-production.up.railway.app/api/v1/auth/login -H 'Content-Type: application/json' -d '{\"email\":\"test@test.com\",\"password\":\"password123\"}')"
     ],
     "additionalDirectories": [
       "/home/thanatos/Work/ocs-nepal-frontend/src/app/products"

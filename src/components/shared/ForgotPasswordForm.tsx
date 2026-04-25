@@ -95,9 +95,9 @@ export default function ForgotPasswordForm() {
           variant="cta"
           size="lg"
           className="w-full"
-          disabled={isLoading}
+          isLoading={isLoading}
         >
-          {isLoading ? "Sending…" : "Send Reset Link"}
+          Send Reset Link
         </Button>
       </form>
 
