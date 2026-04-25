@@ -52,46 +52,46 @@ export async function createOrder(payload: {
   phone: string;
   note?: string;
 }): Promise<Order> {
-  const { data } = await api.post<{ data: ApiOrder }>("/orders", {
+  const { data } = await api.post<ApiOrder>("/orders", {
     delivery_address: payload.deliveryAddress,
     phone: payload.phone,
     note: payload.note,
     payment_method: "cod",
   });
-  return adaptOrder(data.data);
+  return adaptOrder(data);
 }
 
 export async function getOrders(): Promise<Order[]> {
-  const { data } = await api.get<{ data: ApiOrder[] }>("/orders");
-  return Array.isArray(data.data) ? data.data.map(adaptOrder) : [];
+  const { data } = await api.get<ApiOrder[]>("/orders");
+  return Array.isArray(data) ? data.map(adaptOrder) : [];
 }
 
 export async function getOrder(id: string): Promise<Order> {
-  const { data } = await api.get<{ data: ApiOrder }>(`/orders/${id}`);
-  return adaptOrder(data.data);
+  const { data } = await api.get<ApiOrder>(`/orders/${id}`);
+  return adaptOrder(data);
 }
 
 export async function getAllOrders(): Promise<Order[]> {
-  const { data } = await api.get<{ data: ApiOrder[] }>("/admin/orders");
-  return Array.isArray(data.data) ? data.data.map(adaptOrder) : [];
+  const { data } = await api.get<ApiOrder[]>("/admin/orders");
+  return Array.isArray(data) ? data.map(adaptOrder) : [];
 }
 
 export async function confirmOrder(id: string): Promise<Order> {
-  const { data } = await api.put<{ data: ApiOrder }>(`/orders/${id}/confirm`);
-  return adaptOrder(data.data);
+  const { data } = await api.put<ApiOrder>(`/orders/${id}/confirm`);
+  return adaptOrder(data);
 }
 
 export async function outForDelivery(id: string): Promise<Order> {
-  const { data } = await api.put<{ data: ApiOrder }>(`/orders/${id}/out-for-delivery`);
-  return adaptOrder(data.data);
+  const { data } = await api.put<ApiOrder>(`/orders/${id}/out-for-delivery`);
+  return adaptOrder(data);
 }
 
 export async function deliverOrder(id: string): Promise<Order> {
-  const { data } = await api.put<{ data: ApiOrder }>(`/orders/${id}/delivered`);
-  return adaptOrder(data.data);
+  const { data } = await api.put<ApiOrder>(`/orders/${id}/delivered`);
+  return adaptOrder(data);
 }
 
 export async function rejectOrder(id: string, reason: string): Promise<Order> {
-  const { data } = await api.put<{ data: ApiOrder }>(`/orders/${id}/reject`, { reason });
-  return adaptOrder(data.data);
+  const { data } = await api.put<ApiOrder>(`/orders/${id}/reject`, { reason });
+  return adaptOrder(data);
 }

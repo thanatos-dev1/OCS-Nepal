@@ -194,18 +194,20 @@ export default function Navbar() {
                 <Search size={20} />
               </button>
 
-              <Link
-                href="/cart"
-                className="relative p-2 text-text-muted hover:text-primary transition-colors"
-                aria-label="Cart"
-              >
-                <ShoppingCart size={20} />
-                {itemCount > 0 && (
-                  <span className="absolute top-0.5 right-0.5 flex items-center justify-center min-w-4 h-4 px-1 bg-accent text-white text-[10px] font-bold rounded-full">
-                    {itemCount > 99 ? "99+" : itemCount}
-                  </span>
-                )}
-              </Link>
+              {(!user || user.role === "customer") && (
+                <Link
+                  href="/cart"
+                  className="relative p-2 text-text-muted hover:text-primary transition-colors"
+                  aria-label="Cart"
+                >
+                  <ShoppingCart size={20} />
+                  {itemCount > 0 && (
+                    <span className="absolute top-0.5 right-0.5 flex items-center justify-center min-w-4 h-4 px-1 bg-accent text-white text-[10px] font-bold rounded-full">
+                      {itemCount > 99 ? "99+" : itemCount}
+                    </span>
+                  )}
+                </Link>
+              )}
 
               {/* Auth — desktop */}
               {user ? (

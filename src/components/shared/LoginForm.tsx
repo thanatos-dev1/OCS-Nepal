@@ -33,6 +33,7 @@ export default function LoginForm() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const justRegistered = searchParams.get("registered") === "1";
+  const nextUrl = searchParams.get("next");
   const { setToken, setUser } = useAuthStore();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -56,7 +57,8 @@ export default function LoginForm() {
       setToken(access_token);
       const profile = await getProfile();
       setUser(profile);
-      router.push(profile.role === "owner" ? "/dashboard" : "/");
+      const defaultDest = profile.role === "owner" ? "/dashboard" : "/";
+      router.push(nextUrl ?? defaultDest);
     } catch (err) {
       const msg = axios.isAxiosError(err)
         ? (err.response?.data?.error ?? "Invalid email or password.")

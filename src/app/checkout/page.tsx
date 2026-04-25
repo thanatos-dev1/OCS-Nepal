@@ -103,7 +103,7 @@ export default function CheckoutPage() {
         });
       }
 
-      router.push("/account");
+      router.push("/account/orders");
     } catch (err: unknown) {
       const msg = (err as { response?: { data?: { error?: string } } })?.response?.data?.error;
       setApiError(msg ?? "Failed to place order. Please try again.");

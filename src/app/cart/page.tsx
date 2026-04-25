@@ -1,6 +1,7 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { Trash2, ShoppingBag, Minus, Plus, LogIn } from "lucide-react";
 import { useCartQuery, useUpdateCartItemMutation, useRemoveCartItemMutation, useClearCartMutation } from "@/hooks/useCart";
@@ -13,8 +14,16 @@ function formatNPR(amount: number) {
 }
 
 export default function CartPage() {
+  const router = useRouter();
   const token = useAuthStore((s) => s.token);
+  const user = useAuthStore((s) => s.user);
   const isInitialized = useAuthStore((s) => s._isInitialized);
+
+  useEffect(() => {
+    if (!isInitialized) return;
+    if (user?.role === "owner") router.replace("/dashboard");
+    else if (user?.role === "staff") router.replace("/");
+  }, [isInitialized, user?.role, router]);
 
   const { data: items = [], isLoading } = useCartQuery();
   const updateItem = useUpdateCartItemMutation();
@@ -159,7 +168,7 @@ export default function CartPage() {
                   </span>
                   <button
                     onClick={() => handleUpdate(item.productId, item.quantity + 1)}
-                    disabled={isPending}
+                    disabled={isPending || (item.product.stock != null && item.quantity >= item.product.stock)}
                     className="w-8 h-8 flex items-center justify-center text-text-muted hover:bg-bg-subtle hover:text-text transition-colors disabled:opacity-40"
                     aria-label="Increase quantity"
                   >

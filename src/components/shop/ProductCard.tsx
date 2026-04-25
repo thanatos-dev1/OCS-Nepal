@@ -8,7 +8,7 @@ import Badge from "@/components/ui/Badge";
 import ProductImage from "@/components/shop/ProductImage";
 import { cn } from "@/lib/utils";
 import type { Product } from "@/lib/api/types";
-import { useAddToCartMutation } from "@/hooks/useCart";
+import { useAddToCartMutation, useCartQuery } from "@/hooks/useCart";
 import { useAuthStore } from "@/stores/authStore";
 
 function formatNPR(amount: number) {
@@ -23,13 +23,19 @@ interface ProductCardProps {
 export default function ProductCard({ product, showCategory = true }: ProductCardProps) {
   const router = useRouter();
   const token = useAuthStore((s) => s.token);
+  const user = useAuthStore((s) => s.user);
   const addToCart = useAddToCartMutation();
+  const { data: cartItems = [] } = useCartQuery();
   const [added, setAdded] = useState(false);
+
+  const isShopUser = !user || user.role === "customer";
+  const cartQty = cartItems.find((i) => i.productId === parseInt(product.id, 10))?.quantity ?? 0;
+  const atStockLimit = cartQty >= product.stockCount;
 
   function handleAddToCart(e: React.MouseEvent) {
     e.preventDefault();
     e.stopPropagation();
-    if (!product.inStock) return;
+    if (!product.inStock || atStockLimit) return;
     if (!token) { router.push("/account/login"); return; }
     addToCart.mutate(
       { productId: parseInt(product.id, 10), quantity: 1 },
@@ -72,15 +78,17 @@ export default function ProductCard({ product, showCategory = true }: ProductCar
           {product.name}
         </h3>
         <p className="mt-3 text-base font-bold text-text">{formatNPR(product.price)}</p>
-        <Button
-          variant="cta"
-          size="sm"
-          className="mt-3 w-full"
-          disabled={!product.inStock}
-          onClick={handleAddToCart}
-        >
-          {!product.inStock ? "Out of Stock" : added ? "Added!" : "Add to Cart"}
-        </Button>
+        {isShopUser && (
+          <Button
+            variant="cta"
+            size="sm"
+            className="mt-3 w-full"
+            disabled={!product.inStock || atStockLimit}
+            onClick={handleAddToCart}
+          >
+            {!product.inStock ? "Out of Stock" : atStockLimit ? "Max Qty in Cart" : added ? "Added!" : "Add to Cart"}
+          </Button>
+        )}
       </div>
     </Link>
   );
