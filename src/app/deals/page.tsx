@@ -1,3 +1,5 @@
+export const dynamic = "force-dynamic";
+
 import Link from "next/link";
 import { ChevronRight, Tag } from "lucide-react";
 import ProductCard from "@/components/shop/ProductCard";
