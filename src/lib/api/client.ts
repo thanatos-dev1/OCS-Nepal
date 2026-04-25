@@ -1,11 +1,7 @@
 import axios from "axios";
 import { useAuthStore } from "@/stores/authStore";
 
-// Server-side needs the absolute URL; browser uses the Next.js proxy (same-origin, no CORS)
-const baseURL =
-  typeof window === "undefined"
-    ? process.env.BACKEND_URL
-    : process.env.NEXT_PUBLIC_API_URL;
+const baseURL = process.env.NEXT_PUBLIC_API_URL;
 
 const api = axios.create({
   baseURL,
@@ -29,7 +25,10 @@ api.interceptors.response.use((res) => {
 
 // Handle 401 with token refresh + retry queue
 let isRefreshing = false;
-let queue: Array<{ resolve: (t: string) => void; reject: (e: unknown) => void }> = [];
+let queue: Array<{
+  resolve: (t: string) => void;
+  reject: (e: unknown) => void;
+}> = [];
 
 function drainQueue(error: unknown, token: string | null) {
   queue.forEach((p) => (error ? p.reject(error) : p.resolve(token!)));
@@ -58,7 +57,11 @@ api.interceptors.response.use(undefined, async (err) => {
   isRefreshing = true;
 
   try {
-    const { data } = await axios.post("/api/v1/auth/refresh", {}, { withCredentials: true });
+    const { data } = await axios.post(
+      `${process.env.NEXT_PUBLIC_API_URL}/auth/refresh`,
+      {},
+      { withCredentials: true },
+    );
     const newToken: string = data.data.access_token;
     useAuthStore.getState().setToken(newToken);
     drainQueue(null, newToken);

@@ -38,7 +38,7 @@ export const useAuthStore = create<AuthStore>()(
       initAuth: async () => {
         try {
           const res = await axios.post(
-            "/api/v1/auth/refresh",
+            `${process.env.NEXT_PUBLIC_API_URL}/auth/refresh`,
             {},
             { withCredentials: true }
           );
