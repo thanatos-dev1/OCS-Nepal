@@ -5,7 +5,7 @@ import { getProducts } from "@/lib/api/products";
 import ProductsClient from "./ProductsClient";
 
 export default async function ProductsPage() {
-  const products = await getProducts();
+  const products = await getProducts().catch(() => []);
 
   return (
     <Suspense>

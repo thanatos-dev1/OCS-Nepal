@@ -5,10 +5,11 @@ import { useAuthStore } from "@/stores/authStore";
 import AdminSidebar from "@/components/admin/AdminSidebar";
 
 export default function AdminLayout({ children }: { children: React.ReactNode }) {
-  const { user, _hasHydrated } = useAuthStore();
+  const user = useAuthStore((s) => s.user);
+  const isInitialized = useAuthStore((s) => s._isInitialized);
   const router = useRouter();
 
-  if (!_hasHydrated) return null;
+  if (!isInitialized) return null;
 
   if (!user || user.role !== "owner") {
     router.replace("/account/login");

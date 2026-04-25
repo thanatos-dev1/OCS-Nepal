@@ -33,10 +33,17 @@ export type Product = {
   images: string[];
 };
 
+export type OrderStatus = "pending" | "confirmed" | "out_for_delivery" | "delivered" | "cancelled";
+
 export type Order = {
   id: string;
-  status: "pending" | "confirmed" | "shipped" | "delivered" | "cancelled";
+  status: OrderStatus;
   createdAt: string;
   total: number;
+  deliveryAddress: string;
+  phone: string;
+  note?: string;
+  rejectionReason?: string;
   items: { productId: string; name: string; price: number; qty: number }[];
+  user?: { id: number; name: string; email: string };
 };

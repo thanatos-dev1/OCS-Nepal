@@ -5,7 +5,7 @@ import { ChevronRight } from "lucide-react";
 import { getCategories } from "@/lib/api/categories";
 
 export default async function CategoriesPage() {
-  const categories = await getCategories();
+  const categories = await getCategories().catch(() => []);
 
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10">

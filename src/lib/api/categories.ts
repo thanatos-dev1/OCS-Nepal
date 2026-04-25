@@ -1,7 +1,7 @@
 import type { Category } from "./types";
 import api from "./client";
 
-type ApiCategory = { ID: number; Name: string };
+type ApiCategory = { ID: number; Name: string; ProductCount: number };
 
 function toSlug(name: string) {
   return name.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/(^-|-$)/g, "");
@@ -13,7 +13,7 @@ function adaptCategory(c: ApiCategory): Category {
     name: c.Name,
     slug: toSlug(c.Name),
     icon: "",
-    productCount: 0,
+    productCount: c.ProductCount ?? 0,
   };
 }
 

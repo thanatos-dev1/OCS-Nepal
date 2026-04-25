@@ -10,8 +10,8 @@ import { getProducts } from "@/lib/api/products";
 export default async function CategoryPage({ params }: { params: Promise<{ slug: string }> }) {
   const { slug } = await params;
   const [category, products] = await Promise.all([
-    getCategoryBySlug(slug),
-    getProducts({ category: slug }),
+    getCategoryBySlug(slug).catch(() => null),
+    getProducts({ category: slug }).catch(() => []),
   ]);
 
   if (!category) notFound();

@@ -11,6 +11,7 @@ import {
   User,
   LogOut,
   LayoutDashboard,
+  Package,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useCartQuery } from "@/hooks/useCart";
@@ -226,6 +227,16 @@ export default function Navbar() {
                         <User size={14} />
                         {user.role === "owner" ? "Dashboard" : "My Account"}
                       </Link>
+                      {user.role !== "owner" && (
+                        <Link
+                          href="/account/orders"
+                          className="flex items-center gap-2 px-4 py-2.5 text-sm text-text hover:bg-bg-subtle transition-colors"
+                          onClick={() => setUserMenuOpen(false)}
+                        >
+                          <Package size={14} />
+                          My Orders
+                        </Link>
+                      )}
                       <button
                         onClick={handleLogout}
                         disabled={loggingOut}
@@ -331,6 +342,16 @@ export default function Navbar() {
                       <User size={18} />
                       {user.role === "owner" ? "Dashboard" : user.name}
                     </Link>
+                    {user.role !== "owner" && (
+                      <Link
+                        href="/account/orders"
+                        className="flex items-center gap-2 px-3 py-3 text-base font-medium text-text rounded-lg hover:bg-bg-subtle transition-colors"
+                        onClick={() => setMenuOpen(false)}
+                      >
+                        <Package size={18} />
+                        My Orders
+                      </Link>
+                    )}
                     <button
                       onClick={() => { setMenuOpen(false); handleLogout(); }}
                       disabled={loggingOut}

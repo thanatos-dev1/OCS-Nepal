@@ -5,24 +5,33 @@ import { Eye, EyeOff } from "lucide-react";
 import axios from "axios";
 import Button from "@/components/ui/Button";
 import Input from "@/components/ui/Input";
+import AddressAutocomplete from "@/components/ui/AddressAutocomplete";
 import { register } from "@/lib/api/auth";
 
 interface FormErrors {
   name?: string;
   email?: string;
+  phone?: string;
   password?: string;
   confirmPassword?: string;
 }
 
-function validate(name: string, email: string, password: string, confirmPassword: string): FormErrors {
+function validate(
+  name: string,
+  email: string,
+  phone: string,
+  password: string,
+  confirmPassword: string,
+): FormErrors {
   const errors: FormErrors = {};
-  if (!name.trim()) {
-    errors.name = "Full name is required.";
-  }
+  if (!name.trim()) errors.name = "Full name is required.";
   if (!email) {
     errors.email = "Email is required.";
   } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
     errors.email = "Enter a valid email address.";
+  }
+  if (phone.trim() && !/^\d{10}$/.test(phone.trim())) {
+    errors.phone = "Must be 10 digits.";
   }
   if (!password) {
     errors.password = "Password is required.";
@@ -40,6 +49,8 @@ function validate(name: string, email: string, password: string, confirmPassword
 export default function RegisterForm() {
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
+  const [phone, setPhone] = useState("");
+  const [address, setAddress] = useState("");
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
@@ -55,7 +66,7 @@ export default function RegisterForm() {
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
-    const errs = validate(name, email, password, confirmPassword);
+    const errs = validate(name, email, phone, password, confirmPassword);
     if (Object.keys(errs).length > 0) {
       setErrors(errs);
       return;
@@ -64,7 +75,13 @@ export default function RegisterForm() {
     setApiError("");
     setIsLoading(true);
     try {
-      await register(name, email, password);
+      await register(
+        name,
+        email,
+        password,
+        phone.trim() || undefined,
+        address.trim() || undefined,
+      );
       setRegistered(true);
     } catch (err) {
       const msg = axios.isAxiosError(err)
@@ -113,9 +130,7 @@ export default function RegisterForm() {
     <div className="w-full max-w-sm">
       <div className="mb-8">
         <h1 className="text-2xl font-bold text-text">Create an account</h1>
-        <p className="mt-1 text-sm text-text-muted">
-          Join OCS Nepal and start shopping
-        </p>
+        <p className="mt-1 text-sm text-text-muted">Join OCS Nepal and start shopping</p>
       </div>
 
       <form onSubmit={handleSubmit} noValidate className="flex flex-col gap-5">
@@ -145,6 +160,24 @@ export default function RegisterForm() {
           value={email}
           onChange={(e) => { setEmail(e.target.value); clearError("email"); }}
           error={errors.email}
+        />
+
+        <Input
+          id="phone"
+          label={<>Phone number <span className="text-text-disabled font-normal">(optional)</span></>}
+          type="tel"
+          autoComplete="tel"
+          placeholder="98XXXXXXXX"
+          value={phone}
+          onChange={(e) => { setPhone(e.target.value); clearError("phone"); }}
+          error={errors.phone}
+        />
+
+        <AddressAutocomplete
+          label="Delivery address (optional)"
+          value={address}
+          onChange={setAddress}
+          placeholder="Search your area, street…"
         />
 
         <Input

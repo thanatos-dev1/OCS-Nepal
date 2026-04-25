@@ -6,7 +6,7 @@ import ProductCard from "@/components/shop/ProductCard";
 import { getProducts } from "@/lib/api/products";
 
 export default async function DealsPage() {
-  const products = await getProducts();
+  const products = await getProducts().catch(() => []);
   const deals = products.filter((p) => p.badge);
 
   return (

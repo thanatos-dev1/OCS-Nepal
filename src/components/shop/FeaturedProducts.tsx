@@ -4,7 +4,7 @@ import ProductCard from "@/components/shop/ProductCard";
 import { getFeaturedProducts } from "@/lib/api/products";
 
 export default async function FeaturedProducts() {
-  const products = await getFeaturedProducts();
+  const products = await getFeaturedProducts().catch(() => []);
 
   return (
     <section className="bg-bg-subtle py-16">

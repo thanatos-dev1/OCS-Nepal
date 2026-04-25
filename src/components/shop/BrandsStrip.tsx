@@ -2,7 +2,7 @@ import { getBrands } from "@/lib/api/brands";
 import BrandsMarquee from "./BrandsMarquee";
 
 export default async function BrandsStrip() {
-  const brands = await getBrands();
+  const brands = await getBrands().catch(() => []);
 
   return (
     <section className="bg-bg-subtle border-y border-border py-6">

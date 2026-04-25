@@ -211,9 +211,11 @@ export default function CartPage() {
               <span>{formatNPR(subtotal)}</span>
             </div>
 
-            <Button variant="cta" size="lg" className="w-full">
-              Proceed to Checkout
-            </Button>
+            <Link href="/checkout">
+              <Button variant="cta" size="lg" className="w-full">
+                Proceed to Checkout
+              </Button>
+            </Link>
 
             <Link
               href="/products"
