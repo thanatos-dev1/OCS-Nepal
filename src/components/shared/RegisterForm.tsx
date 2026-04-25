@@ -2,8 +2,10 @@
 
 import { useState } from "react";
 import { Eye, EyeOff } from "lucide-react";
+import axios from "axios";
 import Button from "@/components/ui/Button";
 import Input from "@/components/ui/Input";
+import { register } from "@/lib/api/auth";
 
 interface FormErrors {
   name?: string;
@@ -43,7 +45,9 @@ export default function RegisterForm() {
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirm, setShowConfirm] = useState(false);
   const [errors, setErrors] = useState<FormErrors>({});
+  const [apiError, setApiError] = useState("");
   const [isLoading, setIsLoading] = useState(false);
+  const [registered, setRegistered] = useState(false);
 
   function clearError(field: keyof FormErrors) {
     setErrors((prev) => ({ ...prev, [field]: undefined }));
@@ -57,10 +61,19 @@ export default function RegisterForm() {
       return;
     }
     setErrors({});
+    setApiError("");
     setIsLoading(true);
-    // TODO: replace with Axios call when API is ready
-    await new Promise((r) => setTimeout(r, 1200));
-    setIsLoading(false);
+    try {
+      await register(name, email, password);
+      setRegistered(true);
+    } catch (err) {
+      const msg = axios.isAxiosError(err)
+        ? (err.response?.data?.error ?? "Registration failed. Please try again.")
+        : "Registration failed. Please try again.";
+      setApiError(msg);
+    } finally {
+      setIsLoading(false);
+    }
   }
 
   const PasswordToggle = ({ show, onToggle }: { show: boolean; onToggle: () => void }) => (
@@ -74,6 +87,28 @@ export default function RegisterForm() {
     </button>
   );
 
+  if (registered) {
+    return (
+      <div className="w-full max-w-sm text-center">
+        <div className="mb-4 flex justify-center">
+          <div className="rounded-full bg-success-light p-4">
+            <svg className="h-8 w-8 text-success" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+              <path strokeLinecap="round" strokeLinejoin="round" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+            </svg>
+          </div>
+        </div>
+        <h1 className="text-2xl font-bold text-text">Check your email</h1>
+        <p className="mt-2 text-sm text-text-muted">
+          We sent a verification link to <span className="font-medium text-text">{email}</span>.
+          Click it to activate your account, then sign in.
+        </p>
+        <a href="/account/login" className="mt-6 inline-block text-sm text-accent hover:text-accent-hover font-medium transition-colors">
+          Go to sign in
+        </a>
+      </div>
+    );
+  }
+
   return (
     <div className="w-full max-w-sm">
       <div className="mb-8">
@@ -84,6 +119,12 @@ export default function RegisterForm() {
       </div>
 
       <form onSubmit={handleSubmit} noValidate className="flex flex-col gap-5">
+        {apiError && (
+          <p className="text-sm text-error bg-error-light border border-error/20 rounded-md px-4 py-3">
+            {apiError}
+          </p>
+        )}
+
         <Input
           id="name"
           label="Full name"
@@ -135,9 +176,9 @@ export default function RegisterForm() {
           variant="cta"
           size="lg"
           className="w-full mt-1"
-          disabled={isLoading}
+          isLoading={isLoading}
         >
-          {isLoading ? "Creating account…" : "Create Account"}
+          Create Account
         </Button>
       </form>
 

@@ -1,11 +1,13 @@
 "use client";
 
 import { useState } from "react";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { Eye, EyeOff } from "lucide-react";
+import axios from "axios";
 import Button from "@/components/ui/Button";
 import Input from "@/components/ui/Input";
-import { cn } from "@/lib/utils";
+import { login, getProfile } from "@/lib/api/auth";
+import { useAuthStore } from "@/stores/authStore";
 
 interface FormErrors {
   email?: string;
@@ -29,10 +31,14 @@ function validate(email: string, password: string): FormErrors {
 
 export default function LoginForm() {
   const router = useRouter();
+  const searchParams = useSearchParams();
+  const justRegistered = searchParams.get("registered") === "1";
+  const { setToken, setUser } = useAuthStore();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const [errors, setErrors] = useState<FormErrors>({});
+  const [apiError, setApiError] = useState("");
   const [isLoading, setIsLoading] = useState(false);
 
   async function handleSubmit(e: React.FormEvent) {
@@ -43,10 +49,22 @@ export default function LoginForm() {
       return;
     }
     setErrors({});
+    setApiError("");
     setIsLoading(true);
-    // TODO: replace with Axios call when API is ready
-    await new Promise((r) => setTimeout(r, 1200));
-    setIsLoading(false);
+    try {
+      const { access_token } = await login(email, password);
+      setToken(access_token);
+      const profile = await getProfile();
+      setUser(profile);
+      router.push(profile.role === "owner" ? "/dashboard" : "/");
+    } catch (err) {
+      const msg = axios.isAxiosError(err)
+        ? (err.response?.data?.error ?? "Invalid email or password.")
+        : "Login failed. Please try again.";
+      setApiError(msg);
+    } finally {
+      setIsLoading(false);
+    }
   }
 
   return (
@@ -58,7 +76,19 @@ export default function LoginForm() {
         </p>
       </div>
 
+      {justRegistered && (
+        <p className="mb-4 text-sm text-success bg-success-light border border-success/20 rounded-md px-4 py-3">
+          Account verified! You can now sign in.
+        </p>
+      )}
+
       <form onSubmit={handleSubmit} noValidate className="flex flex-col gap-5">
+        {apiError && (
+          <p className="text-sm text-error bg-error-light border border-error/20 rounded-md px-4 py-3">
+            {apiError}
+          </p>
+        )}
+
         <Input
           id="email"
           label="Email address"
@@ -113,9 +143,9 @@ export default function LoginForm() {
           variant="cta"
           size="lg"
           className="w-full"
-          disabled={isLoading}
+          isLoading={isLoading}
         >
-          {isLoading ? "Signing in…" : "Sign In"}
+          Sign In
         </Button>
 
         <div className="flex items-center gap-3">
