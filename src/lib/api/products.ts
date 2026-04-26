@@ -2,7 +2,7 @@ import type { Product } from "./types";
 import api from "./client";
 
 // Shape returned by the Go API (PascalCase GORM model)
-type ApiProduct = {
+export type ApiProduct = {
   ID: number;
   Name: string;
   Price: number;
@@ -12,6 +12,9 @@ type ApiProduct = {
   ImageURL?: string;
   Stock?: number;
   Category?: { ID: number; Name: string };
+  IsFeatured?: boolean;
+  IsNewArrival?: boolean;
+  SalePrice?: number;
 };
 
 export type ProductInput = {
@@ -22,13 +25,14 @@ export type ProductInput = {
   brand?: string;
   image_url?: string;
   category_id?: number;
+  is_featured?: boolean;
 };
 
 function toSlug(name: string) {
   return name.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/(^-|-$)/g, "");
 }
 
-function adaptProduct(p: ApiProduct): Product {
+export function adaptProduct(p: ApiProduct): Product {
   return {
     id: String(p.ID),
     name: p.Name,
@@ -43,6 +47,9 @@ function adaptProduct(p: ApiProduct): Product {
     category: p.Category?.Name ?? "",
     categorySlug: p.Category ? toSlug(p.Category.Name) : "",
     specs: [],
+    isFeatured: p.IsFeatured ?? true,
+    isNewArrival: p.IsNewArrival ?? true,
+    salePrice: p.SalePrice,
   };
 }
 
@@ -88,8 +95,25 @@ export async function getProductById(id: string): Promise<Product | null> {
 
 export async function getFeaturedProducts(): Promise<Product[]> {
   const products = await getProducts();
-  const featured = products.filter((p) => p.badge === "Popular" || p.badge === "New");
-  return (featured.length > 0 ? featured : products).slice(0, 4);
+  return products.filter((p) => p.isFeatured);
+}
+
+export async function getNewArrivals(): Promise<Product[]> {
+  const products = await getProducts();
+  return products.filter((p) => p.isNewArrival);
+}
+
+export async function getDeals(): Promise<Product[]> {
+  const products = await getProducts();
+  return products.filter((p) => p.salePrice !== undefined && p.salePrice < p.price);
+}
+
+export async function getBudgetPicks(maxPrice: number): Promise<Product[]> {
+  const products = await getProducts();
+  return products.filter((p) => {
+    const effectivePrice = p.salePrice ?? p.price;
+    return effectivePrice <= maxPrice;
+  });
 }
 
 // --- Owner endpoints ---
@@ -113,4 +137,9 @@ export async function updateProduct(id: number, input: ProductInput): Promise<Pr
 
 export async function deleteProduct(id: number): Promise<void> {
   await api.delete(`/products/${id}`);
+}
+
+export async function updateStock(id: number, stock: number): Promise<Product> {
+  const { data } = await api.patch<ApiProduct>(`/admin/products/${id}/stock`, { stock });
+  return adaptProduct(data);
 }

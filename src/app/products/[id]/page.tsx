@@ -3,6 +3,7 @@ import { notFound } from "next/navigation";
 import { ShieldCheck, Truck, RotateCcw, ChevronRight } from "lucide-react";
 import ProductImage from "@/components/shop/ProductImage";
 import AddToCartButton from "@/components/shop/AddToCartButton";
+import TrackView from "@/components/shop/TrackView";
 import { getProductById } from "@/lib/api/products";
 
 function formatNPR(amount: number) {
@@ -21,6 +22,7 @@ export default async function ProductPage({
 
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+      <TrackView product={product} />
       {/* Breadcrumb */}
       <nav className="flex items-center gap-1.5 text-sm text-text-muted mb-8">
         <Link href="/" className="hover:text-primary transition-colors">

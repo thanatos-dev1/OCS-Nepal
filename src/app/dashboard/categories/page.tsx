@@ -15,6 +15,7 @@ const TableSkeleton = () => (
         <tr>
           <th className="text-left px-4 py-3 font-medium">Name</th>
           <th className="text-left px-4 py-3 font-medium">Slug</th>
+          <th className="text-left px-4 py-3 font-medium">In Bar</th>
           <th className="px-4 py-3" />
         </tr>
       </thead>
@@ -62,6 +63,7 @@ export default function AdminCategoriesPage() {
               <tr>
                 <th className="text-left px-4 py-3 font-medium">Name</th>
                 <th className="text-left px-4 py-3 font-medium">Slug</th>
+                <th className="text-left px-4 py-3 font-medium">In Bar</th>
                 <th className="px-4 py-3" />
               </tr>
             </thead>
@@ -70,6 +72,11 @@ export default function AdminCategoriesPage() {
                 <tr key={c.id} className="bg-bg hover:bg-bg-subtle transition-colors">
                   <td className="px-4 py-3 font-medium text-text">{c.name}</td>
                   <td className="px-4 py-3 text-text-muted font-mono text-xs">{c.slug}</td>
+                  <td className="px-4 py-3">
+                    <span className={`inline-block px-2 py-0.5 text-xs font-semibold rounded-full ${c.showInBar ? "text-success bg-success-light" : "text-text-muted bg-bg-subtle"}`}>
+                      {c.showInBar ? "Yes" : "No"}
+                    </span>
+                  </td>
                   <td className="px-4 py-3">
                     <div className="flex items-center justify-end gap-2">
                       <button
@@ -96,7 +103,7 @@ export default function AdminCategoriesPage() {
       {modal.open && (
         <CategoryModal
           initial={modal.category}
-          onSave={(name) => saveMutation.mutateAsync(name)}
+          onSave={(data) => saveMutation.mutateAsync(data)}
           onClose={() => setModal({ open: false, category: null })}
         />
       )}

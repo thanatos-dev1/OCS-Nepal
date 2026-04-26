@@ -6,9 +6,10 @@ export default async function CategoryGrid() {
   const categories = await getCategories();
 
   return (
-    <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
+    <section className="bg-bg-subtle py-16">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
       <div className="flex items-center justify-between mb-8">
-        <h2 className="text-2xl font-bold text-gray-900">Shop by Category</h2>
+        <h2 className="text-2xl font-bold text-text">Shop by Category</h2>
         <Link href="/categories" className="text-sm font-medium text-primary hover:text-primary-hover flex items-center gap-1">
           View all <ArrowRight size={14} />
         </Link>
@@ -18,17 +19,18 @@ export default async function CategoryGrid() {
           <Link
             key={cat.slug}
             href={`/categories/${cat.slug}`}
-            className="group flex flex-col items-center gap-3 p-4 bg-white border border-gray-200 rounded-xl hover:border-primary hover:shadow-md transition-all text-center"
+            className="group flex flex-col items-center gap-3 p-4 bg-bg-card border border-border rounded-xl hover:border-primary hover:shadow-md transition-all text-center"
           >
             <span className="text-3xl">{cat.icon}</span>
             <div>
-              <p className="text-sm font-semibold text-gray-900 group-hover:text-primary transition-colors">
+              <p className="text-sm font-semibold text-text group-hover:text-primary transition-colors">
                 {cat.name}
               </p>
-              <p className="text-xs text-gray-400 mt-0.5">{cat.productCount} items</p>
+              <p className="text-xs text-text-muted mt-0.5">{cat.productCount} items</p>
             </div>
           </Link>
         ))}
+      </div>
       </div>
     </section>
   );

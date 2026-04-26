@@ -13,11 +13,11 @@ export function useCategoriesQuery() {
 export function useSaveCategoryMutation(editingCategory: Category | null) {
   const qc = useQueryClient();
   return useMutation({
-    mutationFn: async (name: string) => {
+    mutationFn: async ({ name, showInBar }: { name: string; showInBar: boolean }) => {
       if (editingCategory) {
-        await updateCategory(parseInt(editingCategory.id, 10), name);
+        await updateCategory(parseInt(editingCategory.id, 10), name, showInBar);
       } else {
-        await createCategory(name);
+        await createCategory(name, showInBar);
       }
     },
     onSuccess: () => qc.invalidateQueries({ queryKey: queryKeys.categories }),

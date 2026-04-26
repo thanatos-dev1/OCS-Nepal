@@ -59,9 +59,11 @@ export default function ProductCard({ product, showCategory = true }: ProductCar
           alt={product.name}
           category={product.category}
         />
-        {product.badge && (
+        {product.salePrice ? (
+          <Badge label="Sale" className="absolute top-3 left-3" />
+        ) : product.badge ? (
           <Badge label={product.badge} className="absolute top-3 left-3" />
-        )}
+        ) : null}
         {!product.inStock && (
           <span className="absolute top-3 right-3 px-2 py-0.5 text-xs font-semibold bg-bg text-text-disabled border border-border rounded-sm">
             Out of Stock
@@ -77,7 +79,14 @@ export default function ProductCard({ product, showCategory = true }: ProductCar
         <h3 className={cn("text-sm font-semibold leading-snug transition-colors text-text group-hover:text-primary", !showCategory && "mt-0")}>
           {product.name}
         </h3>
-        <p className="mt-3 text-base font-bold text-text">{formatNPR(product.price)}</p>
+        {product.salePrice ? (
+          <div className="mt-3 flex items-baseline gap-2">
+            <span className="text-base font-bold text-error">{formatNPR(product.salePrice)}</span>
+            <span className="text-sm text-text-muted line-through">{formatNPR(product.price)}</span>
+          </div>
+        ) : (
+          <p className="mt-3 text-base font-bold text-text">{formatNPR(product.price)}</p>
+        )}
         {isShopUser && (
           <Button
             variant="cta"

@@ -13,7 +13,7 @@ type ApiOrderItem = {
 
 type ApiUser = { ID: number; Name: string; Email: string };
 
-type ApiOrder = {
+export type ApiOrder = {
   ID: number;
   CreatedAt: string;
   Status: string;
@@ -22,12 +22,13 @@ type ApiOrder = {
   Phone: string;
   Note?: string;
   RejectionReason?: string;
+  TrackingNumber?: string;
   PaymentMethod?: string;
   Items: ApiOrderItem[];
   User?: ApiUser;
 };
 
-function adaptOrder(o: ApiOrder): Order {
+export function adaptOrder(o: ApiOrder): Order {
   return {
     id: String(o.ID),
     status: o.Status as Order["status"],
@@ -37,6 +38,7 @@ function adaptOrder(o: ApiOrder): Order {
     phone: o.Phone,
     note: o.Note,
     rejectionReason: o.RejectionReason,
+    trackingNumber: o.TrackingNumber,
     items: (o.Items ?? []).map((i) => ({
       productId: String(i.ProductID),
       name: i.Product?.Name ?? "",
@@ -93,5 +95,10 @@ export async function deliverOrder(id: string): Promise<Order> {
 
 export async function rejectOrder(id: string, reason: string): Promise<Order> {
   const { data } = await api.put<ApiOrder>(`/orders/${id}/reject`, { reason });
+  return adaptOrder(data);
+}
+
+export async function updateTracking(id: string, trackingNumber: string): Promise<Order> {
+  const { data } = await api.put<ApiOrder>(`/admin/orders/${id}/tracking`, { tracking_number: trackingNumber });
   return adaptOrder(data);
 }

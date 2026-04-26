@@ -23,6 +23,9 @@ export default function ProductModal({ initial, categories, onSave, onClose }: P
   const [description, setDescription] = useState(initial?.description ?? "");
   const [brand, setBrand] = useState(initial?.brand ?? "");
   const [categoryId, setCategoryId] = useState(initial?.categoryId ?? "");
+  const [isFeatured, setIsFeatured] = useState(initial?.isFeatured ?? false);
+  const [isNewArrival, setIsNewArrival] = useState(initial?.isNewArrival ?? false);
+  const [salePrice, setSalePrice] = useState(initial?.salePrice ? String(initial.salePrice) : "");
   const [imageFile, setImageFile] = useState<File | null>(null);
   const [imagePreview, setImagePreview] = useState<string>(initial?.images[0] ?? "");
   const [errors, setErrors] = useState<FieldErrors>({});
@@ -46,6 +49,11 @@ export default function ProductModal({ initial, categories, onSave, onClose }: P
     if (!name.trim()) errs.name = "Required";
     const p = parseFloat(price);
     if (!price || isNaN(p) || p <= 0) errs.price = "Must be a positive number";
+    if (salePrice) {
+      const sp = parseFloat(salePrice);
+      if (isNaN(sp) || sp <= 0) errs.price = "Sale price must be a positive number";
+      else if (sp >= p) errs.price = "Sale price must be less than regular price";
+    }
     const s = parseInt(stock, 10);
     if (stock && (isNaN(s) || s < 0)) errs.stock = "Must be 0 or more";
     setErrors(errs);
@@ -65,6 +73,9 @@ export default function ProductModal({ initial, categories, onSave, onClose }: P
     if (description.trim()) form.append("description", description.trim());
     if (brand.trim()) form.append("brand", brand.trim());
     if (categoryId) form.append("category_id", categoryId);
+    form.append("is_featured", String(isFeatured));
+    form.append("is_new_arrival", String(isNewArrival));
+    if (salePrice) form.append("sale_price", salePrice);
     if (imageFile) form.append("image", imageFile);
     // pass existing image_url if no new file chosen (for updates)
     else if (initial?.images[0]) form.append("image_url", initial.images[0]);
@@ -123,6 +134,17 @@ export default function ProductModal({ initial, categories, onSave, onClose }: P
             <Input id="p-stock" label="Stock" type="number" min="0" value={stock} onChange={(e) => { setStock(e.target.value); setErrors((prev) => ({ ...prev, stock: undefined })); }} error={errors.stock} placeholder="10" />
           </div>
 
+          <div className="grid grid-cols-2 gap-4">
+            <div>
+              <Input id="p-sale-price" label="Sale Price (NPR)" type="number" min="0" step="0.01" value={salePrice} onChange={(e) => setSalePrice(e.target.value)} placeholder="Optional" />
+              {salePrice && price && parseFloat(salePrice) > 0 && parseFloat(salePrice) < parseFloat(price) && (
+                <p className="mt-1 text-xs text-success font-medium">
+                  {Math.round(((parseFloat(price) - parseFloat(salePrice)) / parseFloat(price)) * 100)}% off
+                </p>
+              )}
+            </div>
+          </div>
+
           <Input id="p-brand" label="Brand" value={brand} onChange={(e) => setBrand(e.target.value)} placeholder="NVIDIA" />
 
           <div className="flex flex-col gap-1.5">
@@ -138,6 +160,27 @@ export default function ProductModal({ initial, categories, onSave, onClose }: P
                 <option key={c.id} value={c.id}>{c.name}</option>
               ))}
             </select>
+          </div>
+
+          <div className="flex flex-col gap-2">
+            <label className="flex items-center gap-3 cursor-pointer select-none">
+              <input
+                type="checkbox"
+                checked={isFeatured}
+                onChange={(e) => setIsFeatured(e.target.checked)}
+                className="w-4 h-4 rounded border-border accent-accent"
+              />
+              <span className="text-sm font-medium text-text">Feature on homepage</span>
+            </label>
+            <label className="flex items-center gap-3 cursor-pointer select-none">
+              <input
+                type="checkbox"
+                checked={isNewArrival}
+                onChange={(e) => setIsNewArrival(e.target.checked)}
+                className="w-4 h-4 rounded border-border accent-accent"
+              />
+              <span className="text-sm font-medium text-text">Mark as new arrival</span>
+            </label>
           </div>
 
           <div className="flex flex-col gap-1.5">

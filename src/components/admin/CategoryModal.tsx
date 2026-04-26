@@ -7,12 +7,13 @@ import type { Category } from "@/lib/api/types";
 
 interface Props {
   initial?: Category | null;
-  onSave: (name: string) => Promise<void>;
+  onSave: (data: { name: string; showInBar: boolean }) => Promise<void>;
   onClose: () => void;
 }
 
 export default function CategoryModal({ initial, onSave, onClose }: Props) {
   const [name, setName] = useState(initial?.name ?? "");
+  const [showInBar, setShowInBar] = useState(initial?.showInBar ?? false);
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
 
@@ -21,7 +22,7 @@ export default function CategoryModal({ initial, onSave, onClose }: Props) {
     if (!name.trim()) { setError("Name is required"); return; }
     setLoading(true);
     try {
-      await onSave(name.trim());
+      await onSave({ name: name.trim(), showInBar });
       onClose();
     } catch (err: unknown) {
       const msg = (err as { response?: { data?: { error?: string } } })?.response?.data?.error;
@@ -49,6 +50,15 @@ export default function CategoryModal({ initial, onSave, onClose }: Props) {
             placeholder="e.g. Graphics Cards"
             autoFocus
           />
+          <label className="flex items-center gap-3 cursor-pointer select-none">
+            <input
+              type="checkbox"
+              checked={showInBar}
+              onChange={(e) => setShowInBar(e.target.checked)}
+              className="w-4 h-4 rounded border-border accent-accent"
+            />
+            <span className="text-sm font-medium text-text">Show in category bar</span>
+          </label>
           <div className="flex justify-end gap-3 pt-1">
             <Button type="button" variant="outline" size="sm" onClick={onClose} disabled={loading}>
               Cancel

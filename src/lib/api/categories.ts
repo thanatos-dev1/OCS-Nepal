@@ -1,7 +1,7 @@
 import type { Category } from "./types";
 import api from "./client";
 
-type ApiCategory = { ID: number; Name: string; ProductCount: number };
+type ApiCategory = { ID: number; Name: string; ProductCount: number; ShowInBar?: boolean };
 
 function toSlug(name: string) {
   return name.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/(^-|-$)/g, "");
@@ -14,6 +14,7 @@ function adaptCategory(c: ApiCategory): Category {
     slug: toSlug(c.Name),
     icon: "",
     productCount: c.ProductCount ?? 0,
+    showInBar: c.ShowInBar ?? false,
   };
 }
 
@@ -29,13 +30,13 @@ export async function getCategoryBySlug(slug: string): Promise<Category | null> 
 
 // --- Owner endpoints ---
 
-export async function createCategory(name: string): Promise<Category> {
-  const { data } = await api.post<ApiCategory>("/categories", { name });
+export async function createCategory(name: string, showInBar: boolean): Promise<Category> {
+  const { data } = await api.post<ApiCategory>("/categories", { name, show_in_bar: showInBar });
   return adaptCategory(data);
 }
 
-export async function updateCategory(id: number, name: string): Promise<Category> {
-  const { data } = await api.put<ApiCategory>(`/categories/${id}`, { name });
+export async function updateCategory(id: number, name: string, showInBar: boolean): Promise<Category> {
+  const { data } = await api.put<ApiCategory>(`/categories/${id}`, { name, show_in_bar: showInBar });
   return adaptCategory(data);
 }
 

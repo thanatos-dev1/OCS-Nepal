@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { Geist } from "next/font/google";
 import Navbar from "@/components/shared/Navbar";
+import CategoryBar from "@/components/shared/CategoryBar";
 import Footer from "@/components/shared/Footer";
 import AuthInit from "@/components/shared/AuthInit";
 import Providers from "@/components/shared/Providers";
@@ -28,7 +29,7 @@ export default function RootLayout({
         <Providers>
           <AuthInit />
           <Navbar />
-
+          <CategoryBar />
           <main className="flex-1">{children}</main>
           <Footer />
         </Providers>

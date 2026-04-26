@@ -1,7 +1,7 @@
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import {
   createOrder, getOrders, getOrder, getAllOrders,
-  confirmOrder, outForDelivery, deliverOrder, rejectOrder,
+  confirmOrder, outForDelivery, deliverOrder, rejectOrder, updateTracking,
 } from "@/lib/api/orders";
 import { queryKeys } from "@/lib/queries";
 import { useAuthStore } from "@/stores/authStore";
@@ -75,5 +75,16 @@ export function useRejectOrderMutation() {
   return useMutation({
     mutationFn: ({ id, reason }: { id: string; reason: string }) => rejectOrder(id, reason),
     onSuccess: () => qc.invalidateQueries({ queryKey: queryKeys.allOrders }),
+  });
+}
+
+export function useUpdateTrackingMutation(orderId: string) {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: (trackingNumber: string) => updateTracking(orderId, trackingNumber),
+    onSuccess: () => {
+      qc.invalidateQueries({ queryKey: queryKeys.allOrders });
+      qc.invalidateQueries({ queryKey: queryKeys.order(orderId) });
+    },
   });
 }

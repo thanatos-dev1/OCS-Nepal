@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
-import { LayoutGrid, Tag, LogOut, Package } from "lucide-react";
+import { LayoutGrid, Tag, LogOut, Package, Percent, Ticket, Users, Boxes } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useAuthStore } from "@/stores/authStore";
 import { logout } from "@/lib/api/auth";
@@ -10,7 +10,11 @@ import { logout } from "@/lib/api/auth";
 const nav = [
   { label: "Products", href: "/dashboard/products", icon: LayoutGrid },
   { label: "Categories", href: "/dashboard/categories", icon: Tag },
+  { label: "Inventory", href: "/dashboard/inventory", icon: Boxes },
+  { label: "Offers", href: "/dashboard/offers", icon: Percent },
+  { label: "Coupons", href: "/dashboard/coupons", icon: Ticket },
   { label: "Orders", href: "/dashboard/orders", icon: Package },
+  { label: "Customers", href: "/dashboard/customers", icon: Users },
 ];
 
 export default function AdminSidebar() {
