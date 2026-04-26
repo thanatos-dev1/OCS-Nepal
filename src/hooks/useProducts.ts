@@ -37,6 +37,9 @@ export function useSaveProductMutation(editingProduct: Product | null) {
           brand: (form.get("brand") as string) || undefined,
           category_id: form.get("category_id") ? parseInt(form.get("category_id") as string, 10) : undefined,
           image_url: imageUrl,
+          is_featured: form.get("is_featured") === "true",
+          is_new_arrival: form.get("is_new_arrival") === "true",
+          sale_price: form.get("sale_price") ? parseFloat(form.get("sale_price") as string) : undefined,
         });
       } else {
         const imageFile = form.get("image");

@@ -26,6 +26,8 @@ export type ProductInput = {
   image_url?: string;
   category_id?: number;
   is_featured?: boolean;
+  is_new_arrival?: boolean;
+  sale_price?: number;
 };
 
 function toSlug(name: string) {
