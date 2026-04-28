@@ -1,7 +1,16 @@
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import {
-  createOrder, getOrders, getOrder, getAllOrders,
-  confirmOrder, outForDelivery, deliverOrder, rejectOrder, updateTracking,
+  createOrder,
+  createGuestOrder,
+  getOrders,
+  getOrder,
+  getAllOrders,
+  confirmOrder,
+  outForDelivery,
+  deliverOrder,
+  rejectOrder,
+  updateTracking,
+  requestReturn,
 } from "@/lib/api/orders";
 import { queryKeys } from "@/lib/queries";
 import { useAuthStore } from "@/stores/authStore";
@@ -38,12 +47,15 @@ export function usePlaceOrderMutation() {
   return useMutation({
     mutationFn: createOrder,
     onSuccess: () => {
-      // Backend clears the cart on order success — just invalidate both
       qc.invalidateQueries({ queryKey: queryKeys.orders });
       qc.invalidateQueries({ queryKey: queryKeys.cart });
-      qc.invalidateQueries({ queryKey: queryKeys.profile }); // purchase_badge may flip
+      qc.invalidateQueries({ queryKey: queryKeys.profile });
     },
   });
+}
+
+export function usePlaceGuestOrderMutation() {
+  return useMutation({ mutationFn: createGuestOrder });
 }
 
 export function useConfirmOrderMutation() {
@@ -81,10 +93,27 @@ export function useRejectOrderMutation() {
 export function useUpdateTrackingMutation(orderId: string) {
   const qc = useQueryClient();
   return useMutation({
-    mutationFn: (trackingNumber: string) => updateTracking(orderId, trackingNumber),
+    mutationFn: ({ trackingNumber, carrier }: { trackingNumber: string; carrier?: string }) =>
+      updateTracking(orderId, trackingNumber, carrier),
     onSuccess: () => {
       qc.invalidateQueries({ queryKey: queryKeys.allOrders });
       qc.invalidateQueries({ queryKey: queryKeys.order(orderId) });
     },
+  });
+}
+
+export function useRequestReturnMutation() {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: ({
+      orderId,
+      orderItemId,
+      reason,
+    }: {
+      orderId: string;
+      orderItemId: number;
+      reason: string;
+    }) => requestReturn(orderId, orderItemId, reason),
+    onSuccess: () => qc.invalidateQueries({ queryKey: queryKeys.orders }),
   });
 }

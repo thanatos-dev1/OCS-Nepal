@@ -36,18 +36,17 @@ export default function HeroFeaturedCard() {
   if (products.length === 0) return null;
 
   const product = products[index];
-  const image = product.images[0];
-
+  const imageUrl = product.images?.[0]?.url;
 
   return (
     <div className="flex flex-col items-center text-center gap-6">
       {/* Image with radial glow */}
       <div className="relative flex items-center justify-center w-64 h-64">
         <div className="absolute inset-0 rounded-full bg-accent/10 blur-3xl" />
-        {image ? (
+        {imageUrl ? (
           // eslint-disable-next-line @next/next/no-img-element
           <img
-            src={image}
+            src={imageUrl}
             alt={product.name}
             className="relative w-full h-full object-contain drop-shadow-2xl"
           />
@@ -70,7 +69,7 @@ export default function HeroFeaturedCard() {
           NPR {product.price.toLocaleString("en-NP")}
         </p>
         <Link
-          href={`/products/${product.id}`}
+          href={`/products/${product.slug}`}
           className="mt-4 inline-flex items-center gap-2 px-5 py-2.5 text-sm font-semibold text-white bg-accent hover:bg-accent-hover active:bg-accent-active rounded-md transition-colors"
         >
           View Product <ArrowRight size={14} />

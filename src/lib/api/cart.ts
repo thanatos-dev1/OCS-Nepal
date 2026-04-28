@@ -15,31 +15,48 @@ export type CartItem = {
 };
 
 type ApiCartItem = {
-  ID: number;
-  UserID: number;
-  ProductID: number;
-  Quantity: number;
-  Product: {
-    ID: number;
-    Name: string;
-    Price: number;
+  id?: number;
+  ID?: number;
+  user_id?: number;
+  UserID?: number;
+  product_id?: number;
+  ProductID?: number;
+  quantity?: number;
+  Quantity?: number;
+  product?: {
+    id?: number;
+    ID?: number;
+    name?: string;
+    Name?: string;
+    price?: number;
+    Price?: number;
+    image_url?: string;
+    ImageURL?: string;
+    stock?: number;
+    Stock?: number;
+  };
+  Product?: {
+    ID?: number;
+    Name?: string;
+    Price?: number;
     ImageURL?: string;
     Stock?: number;
   };
 };
 
 function adaptItem(item: ApiCartItem): CartItem {
+  const p = item.product ?? item.Product ?? {};
   return {
-    id: item.ID,
-    userId: item.UserID,
-    productId: item.ProductID,
-    quantity: item.Quantity,
+    id: item.id ?? item.ID ?? 0,
+    userId: item.user_id ?? item.UserID ?? 0,
+    productId: item.product_id ?? item.ProductID ?? 0,
+    quantity: item.quantity ?? item.Quantity ?? 0,
     product: {
-      id: item.Product.ID,
-      name: item.Product.Name,
-      price: item.Product.Price,
-      imageUrl: item.Product.ImageURL,
-      stock: item.Product.Stock,
+      id: (p as {id?: number; ID?: number}).id ?? (p as {id?: number; ID?: number}).ID ?? 0,
+      name: (p as {name?: string; Name?: string}).name ?? (p as {name?: string; Name?: string}).Name ?? "",
+      price: (p as {price?: number; Price?: number}).price ?? (p as {price?: number; Price?: number}).Price ?? 0,
+      imageUrl: (p as {image_url?: string; ImageURL?: string}).image_url ?? (p as {image_url?: string; ImageURL?: string}).ImageURL,
+      stock: (p as {stock?: number; Stock?: number}).stock ?? (p as {stock?: number; Stock?: number}).Stock,
     },
   };
 }

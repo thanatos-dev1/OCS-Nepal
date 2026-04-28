@@ -12,6 +12,8 @@ import {
   LogOut,
   LayoutDashboard,
   Package,
+  Heart,
+  MapPin,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useCartQuery } from "@/hooks/useCart";
@@ -230,14 +232,32 @@ export default function Navbar() {
                         {user.role === "owner" ? "Dashboard" : "My Account"}
                       </Link>
                       {user.role !== "owner" && (
-                        <Link
-                          href="/account/orders"
-                          className="flex items-center gap-2 px-4 py-2.5 text-sm text-text hover:bg-bg-subtle transition-colors"
-                          onClick={() => setUserMenuOpen(false)}
-                        >
-                          <Package size={14} />
-                          My Orders
-                        </Link>
+                        <>
+                          <Link
+                            href="/account/orders"
+                            className="flex items-center gap-2 px-4 py-2.5 text-sm text-text hover:bg-bg-subtle transition-colors"
+                            onClick={() => setUserMenuOpen(false)}
+                          >
+                            <Package size={14} />
+                            My Orders
+                          </Link>
+                          <Link
+                            href="/account/wishlist"
+                            className="flex items-center gap-2 px-4 py-2.5 text-sm text-text hover:bg-bg-subtle transition-colors"
+                            onClick={() => setUserMenuOpen(false)}
+                          >
+                            <Heart size={14} />
+                            Wishlist
+                          </Link>
+                          <Link
+                            href="/account/addresses"
+                            className="flex items-center gap-2 px-4 py-2.5 text-sm text-text hover:bg-bg-subtle transition-colors"
+                            onClick={() => setUserMenuOpen(false)}
+                          >
+                            <MapPin size={14} />
+                            My Addresses
+                          </Link>
+                        </>
                       )}
                       <button
                         onClick={handleLogout}
@@ -345,14 +365,32 @@ export default function Navbar() {
                       {user.role === "owner" ? "Dashboard" : user.name}
                     </Link>
                     {user.role !== "owner" && (
-                      <Link
-                        href="/account/orders"
-                        className="flex items-center gap-2 px-3 py-3 text-base font-medium text-text rounded-lg hover:bg-bg-subtle transition-colors"
-                        onClick={() => setMenuOpen(false)}
-                      >
-                        <Package size={18} />
-                        My Orders
-                      </Link>
+                      <>
+                        <Link
+                          href="/account/orders"
+                          className="flex items-center gap-2 px-3 py-3 text-base font-medium text-text rounded-lg hover:bg-bg-subtle transition-colors"
+                          onClick={() => setMenuOpen(false)}
+                        >
+                          <Package size={18} />
+                          My Orders
+                        </Link>
+                        <Link
+                          href="/account/wishlist"
+                          className="flex items-center gap-2 px-3 py-3 text-base font-medium text-text rounded-lg hover:bg-bg-subtle transition-colors"
+                          onClick={() => setMenuOpen(false)}
+                        >
+                          <Heart size={18} />
+                          Wishlist
+                        </Link>
+                        <Link
+                          href="/account/addresses"
+                          className="flex items-center gap-2 px-3 py-3 text-base font-medium text-text rounded-lg hover:bg-bg-subtle transition-colors"
+                          onClick={() => setMenuOpen(false)}
+                        >
+                          <MapPin size={18} />
+                          My Addresses
+                        </Link>
+                      </>
                     )}
                     <button
                       onClick={() => { setMenuOpen(false); handleLogout(); }}

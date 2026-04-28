@@ -27,7 +27,7 @@ export default function ProductModal({ initial, categories, onSave, onClose }: P
   const [isNewArrival, setIsNewArrival] = useState(initial?.isNewArrival ?? false);
   const [salePrice, setSalePrice] = useState(initial?.salePrice ? String(initial.salePrice) : "");
   const [imageFile, setImageFile] = useState<File | null>(null);
-  const [imagePreview, setImagePreview] = useState<string>(initial?.images[0] ?? "");
+  const [imagePreview, setImagePreview] = useState<string>(initial?.images[0]?.url ?? "");
   const [errors, setErrors] = useState<FieldErrors>({});
   const [apiError, setApiError] = useState("");
   const [loading, setLoading] = useState(false);
@@ -78,7 +78,7 @@ export default function ProductModal({ initial, categories, onSave, onClose }: P
     if (salePrice) form.append("sale_price", salePrice);
     if (imageFile) form.append("image", imageFile);
     // pass existing image_url if no new file chosen (for updates)
-    else if (initial?.images[0]) form.append("image_url", initial.images[0]);
+    else if (initial?.images[0]?.url) form.append("image_url", initial.images[0].url);
 
     try {
       await onSave(form);

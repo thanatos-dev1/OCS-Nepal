@@ -103,7 +103,7 @@ export default function AdminCategoriesPage() {
       {modal.open && (
         <CategoryModal
           initial={modal.category}
-          onSave={(data) => saveMutation.mutateAsync(data)}
+          onSave={(data) => saveMutation.mutateAsync({ name: data.name, show_in_bar: data.showInBar })}
           onClose={() => setModal({ open: false, category: null })}
         />
       )}

@@ -14,7 +14,7 @@ interface AddToCartButtonProps {
     price: number;
     inStock: boolean;
     stockCount?: number;
-    images?: string[];
+    images?: { url: string }[];
     category?: string;
   };
 }

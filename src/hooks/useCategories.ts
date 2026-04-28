@@ -1,5 +1,5 @@
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { getCategories, createCategory, updateCategory, deleteCategory } from "@/lib/api/categories";
+import { getCategories, createCategory, updateCategory, deleteCategory, type CategoryInput } from "@/lib/api/categories";
 import { queryKeys } from "@/lib/queries";
 import type { Category } from "@/lib/api/types";
 
@@ -13,11 +13,11 @@ export function useCategoriesQuery() {
 export function useSaveCategoryMutation(editingCategory: Category | null) {
   const qc = useQueryClient();
   return useMutation({
-    mutationFn: async ({ name, showInBar }: { name: string; showInBar: boolean }) => {
+    mutationFn: async (input: CategoryInput) => {
       if (editingCategory) {
-        await updateCategory(parseInt(editingCategory.id, 10), name, showInBar);
+        await updateCategory(parseInt(editingCategory.id, 10), input);
       } else {
-        await createCategory(name, showInBar);
+        await createCategory(input);
       }
     },
     onSuccess: () => qc.invalidateQueries({ queryKey: queryKeys.categories }),
