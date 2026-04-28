@@ -30,7 +30,7 @@ function formatDate(iso: string) {
   return new Date(iso).toLocaleDateString("en-NP", { year: "numeric", month: "short", day: "numeric" });
 }
 
-export default function CustomerDetailPage({ params }: PageProps<"/dashboard/customers/[id]">) {
+export default function CustomerDetailPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = use(params);
   const { data: customer, isLoading: loadingCustomer } = useCustomerQuery(id);
   const { data: orders = [], isLoading: loadingOrders } = useCustomerOrdersQuery(id);

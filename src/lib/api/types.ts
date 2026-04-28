@@ -8,13 +8,25 @@ export type Category = {
   name: string;
   slug: string;
   icon: string;
+  description: string;
+  sortOrder: number;
+  parentId: string | null;
   productCount: number;
   showInBar: boolean;
 };
 
+export type ProductImage = {
+  id: number;
+  url: string;
+  altText: string;
+  isPrimary: boolean;
+  sortOrder: number;
+};
+
 export type ProductSpec = {
-  label: string;
+  key: string;
   value: string;
+  sortOrder: number;
 };
 
 export type Product = {
@@ -27,13 +39,15 @@ export type Product = {
   price: number;
   inStock: boolean;
   stockCount: number;
+  lowStockThreshold: number;
   brand?: string;
   badge?: string;
   description: string;
   specs: ProductSpec[];
-  images: string[];
+  images: ProductImage[];
   isFeatured: boolean;
   isNewArrival: boolean;
+  isActive: boolean;
   salePrice?: number;
 };
 
@@ -56,19 +70,55 @@ export type OfferInput = {
   label?: string;
 };
 
-export type OrderStatus = "pending" | "confirmed" | "out_for_delivery" | "delivered" | "cancelled";
+export type OrderStatus =
+  | "pending"
+  | "confirmed"
+  | "out_for_delivery"
+  | "delivered"
+  | "cancelled";
+
+export type OrderStatusLog = {
+  fromStatus: string;
+  toStatus: string;
+  note?: string;
+  createdAt: string;
+};
+
+export type OrderItemSnapshot = {
+  name: string;
+  sku: string;
+  price: number;
+  imageUrl: string;
+};
+
+export type OrderItem = {
+  id: string;
+  productId: string;
+  productName: string;
+  name: string;
+  price: number;
+  qty: number;
+  snapshot?: OrderItemSnapshot;
+};
 
 export type Order = {
   id: string;
   status: OrderStatus;
   createdAt: string;
+  subtotal: number;
+  shippingAmount: number;
   total: number;
   deliveryAddress: string;
   phone: string;
   note?: string;
   rejectionReason?: string;
   trackingNumber?: string;
-  items: { productId: string; name: string; price: number; qty: number }[];
+  guestEmail?: string;
+  shippingAddressId?: number;
+  couponCode?: string;
+  discountAmount?: number;
+  statusLogs: OrderStatusLog[];
+  items: OrderItem[];
   user?: { id: number; name: string; email: string };
 };
 
@@ -105,4 +155,89 @@ export type Customer = {
   createdAt: string;
   orderCount: number;
   totalSpent: number;
+};
+
+// Addresses
+export type Address = {
+  id: number;
+  fullName: string;
+  line1: string;
+  line2?: string;
+  city: string;
+  state: string;
+  postalCode: string;
+  country: string;
+  isDefault: boolean;
+};
+
+export type AddressInput = {
+  full_name: string;
+  line1: string;
+  line2?: string;
+  city: string;
+  state: string;
+  postal_code: string;
+  country: string;
+};
+
+// Wishlist
+export type WishlistItem = {
+  productId: number;
+  product: Product;
+};
+
+// Reviews
+export type Review = {
+  id: number;
+  rating: number;
+  title: string;
+  body: string;
+  user: { name: string };
+  isVerified: boolean;
+  createdAt: string;
+};
+
+export type ReviewInput = {
+  rating: number;
+  title: string;
+  body: string;
+};
+
+// Returns
+export type ReturnStatus = "pending" | "approved" | "rejected";
+
+export type Return = {
+  id: number;
+  orderId: string;
+  orderItemId: number;
+  reason: string;
+  status: ReturnStatus;
+  notes?: string;
+  createdAt: string;
+  order?: Partial<Order>;
+  item?: Partial<OrderItem>;
+};
+
+// Admin
+export type AdminRole = "super_admin" | "manager" | "staff";
+
+export type AdminUser = {
+  id: number;
+  userId: number;
+  name: string;
+  email: string;
+  role: AdminRole;
+  isActive: boolean;
+  createdAt: string;
+};
+
+export type AuditLog = {
+  id: number;
+  adminId: number;
+  adminName: string;
+  action: string;
+  entity: string;
+  entityId: number;
+  ip: string;
+  createdAt: string;
 };

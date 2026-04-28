@@ -2,28 +2,28 @@ import type { Coupon, CouponInput } from "./types";
 import api from "./client";
 
 type ApiCoupon = {
-  ID: number;
-  Code: string;
-  Type: string;
-  Value: number;
-  MinOrder?: number;
-  MaxUses?: number;
-  UsedCount: number;
-  IsActive: boolean;
-  ExpiresAt?: string;
+  id: number;
+  code: string;
+  type: string;
+  value: number;
+  min_order?: number;
+  max_uses?: number;
+  used_count: number;
+  is_active: boolean;
+  expires_at?: string;
 };
 
 function adaptCoupon(c: ApiCoupon): Coupon {
   return {
-    id: String(c.ID),
-    code: c.Code,
-    type: c.Type as Coupon["type"],
-    value: c.Value,
-    minOrder: c.MinOrder,
-    maxUses: c.MaxUses,
-    usedCount: c.UsedCount,
-    isActive: c.IsActive,
-    expiresAt: c.ExpiresAt,
+    id: String(c.id),
+    code: c.code,
+    type: c.type as Coupon["type"],
+    value: c.value,
+    minOrder: c.min_order,
+    maxUses: c.max_uses,
+    usedCount: c.used_count,
+    isActive: c.is_active,
+    expiresAt: c.expires_at,
   };
 }
 
@@ -47,17 +47,25 @@ export async function deleteCoupon(id: number): Promise<void> {
 }
 
 export type CouponValidationResult = {
+  valid: boolean;
   discountAmount: number;
+  finalTotal: number;
   couponCode: string;
 };
 
-export async function validateCoupon(code: string, cartTotal: number): Promise<CouponValidationResult> {
-  const { data } = await api.post<{ discount_amount: number; coupon: ApiCoupon }>(
-    "/coupons/validate",
-    { code, cart_total: cartTotal }
-  );
+export async function validateCoupon(
+  code: string,
+  orderTotal: number,
+): Promise<CouponValidationResult> {
+  const { data } = await api.post<{
+    valid: boolean;
+    discount_amount: number;
+    final_total: number;
+  }>("/coupons/validate", { code, order_total: orderTotal });
   return {
+    valid: data.valid,
     discountAmount: data.discount_amount,
-    couponCode: data.coupon.Code,
+    finalTotal: data.final_total,
+    couponCode: code,
   };
 }

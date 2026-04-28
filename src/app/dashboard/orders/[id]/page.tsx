@@ -84,7 +84,7 @@ function StatusTimeline({ status }: { status: string }) {
   );
 }
 
-export default function OrderDetailPage({ params }: PageProps<"/dashboard/orders/[id]">) {
+export default function OrderDetailPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = use(params);
   const { data: orders = [], isLoading } = useAllOrdersQuery();
   const order = orders.find((o) => o.id === id);
@@ -133,7 +133,7 @@ export default function OrderDetailPage({ params }: PageProps<"/dashboard/orders
 
   function handleTracking() {
     if (!tracking.trim()) return;
-    updateTrack.mutate(tracking.trim(), {
+    updateTrack.mutate({ trackingNumber: tracking.trim() }, {
       onSuccess: () => { setTrackingOpen(false); setTracking(""); },
     });
   }

@@ -86,9 +86,9 @@ export default function AdminProductsPage() {
                 <tr key={p.id} className="bg-bg hover:bg-bg-subtle transition-colors">
                   <td className="px-4 py-3">
                     <div className="flex items-center gap-3">
-                      {p.images[0] ? (
+                      {p.images[0]?.url ? (
                         // eslint-disable-next-line @next/next/no-img-element
-                        <img src={p.images[0]} alt={p.name} className="w-9 h-9 rounded-md object-cover border border-border" />
+                        <img src={p.images[0].url} alt={p.name} className="w-9 h-9 rounded-md object-cover border border-border" />
                       ) : (
                         <div className="w-9 h-9 rounded-md bg-bg-subtle border border-border" />
                       )}

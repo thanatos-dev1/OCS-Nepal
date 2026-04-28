@@ -3,7 +3,12 @@ import { ArrowRight } from "lucide-react";
 import { getCategories } from "@/lib/api/categories";
 
 export default async function CategoryGrid() {
-  const categories = await getCategories();
+  let categories: Awaited<ReturnType<typeof getCategories>> = [];
+  try {
+    categories = await getCategories();
+  } catch {
+    return null;
+  }
 
   return (
     <section className="bg-bg-subtle py-16">
