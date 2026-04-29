@@ -2,24 +2,36 @@ import type { Review, ReviewInput } from "./types";
 import api from "./client";
 
 type ApiReview = {
-  id: number;
-  rating: number;
-  title: string;
-  body: string;
-  user: { name: string };
-  is_verified: boolean;
-  created_at: string;
+  ID?: number;
+  id?: number;
+  Rating?: number;
+  rating?: number;
+  Title?: string;
+  title?: string;
+  Body?: string;
+  body?: string;
+  User?: { ID?: number; Name?: string; AvatarURL?: string };
+  user?: { name?: string };
+  IsVerified?: boolean;
+  is_verified?: boolean;
+  CreatedAt?: string;
+  created_at?: string;
 };
 
 function adaptReview(r: ApiReview): Review {
+  const u = r.User ?? r.user ?? {};
   return {
-    id: r.id,
-    rating: r.rating,
-    title: r.title,
-    body: r.body,
-    user: { name: r.user.name },
-    isVerified: r.is_verified,
-    createdAt: r.created_at,
+    id: r.ID ?? r.id ?? 0,
+    rating: r.Rating ?? r.rating ?? 0,
+    title: r.Title ?? r.title ?? "",
+    body: r.Body ?? r.body ?? "",
+    user: {
+      id: (u as { ID?: number }).ID,
+      name: (u as { Name?: string; name?: string }).Name ?? (u as { name?: string }).name ?? "",
+      avatarUrl: (u as { AvatarURL?: string }).AvatarURL,
+    },
+    isVerified: r.IsVerified ?? r.is_verified ?? false,
+    createdAt: r.CreatedAt ?? r.created_at ?? "",
   };
 }
 

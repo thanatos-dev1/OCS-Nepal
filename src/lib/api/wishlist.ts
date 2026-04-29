@@ -3,14 +3,21 @@ import { adaptProduct, type ApiProduct } from "./products";
 import api from "./client";
 
 type ApiWishlistItem = {
-  product_id: number;
-  product: ApiProduct;
+  ID?: number;
+  id?: number;
+  product_id?: number;
+  ProductID?: number;
+  product?: ApiProduct;
+  Product?: ApiProduct;
 };
 
 function adaptWishlistItem(w: ApiWishlistItem): WishlistItem {
+  const productData = w.product ?? w.Product ?? {};
+  const productId = w.product_id ?? w.ProductID ?? 0;
   return {
-    productId: w.product_id,
-    product: adaptProduct(w.product),
+    id: w.ID ?? w.id,
+    productId,
+    product: adaptProduct(productData as ApiProduct),
   };
 }
 

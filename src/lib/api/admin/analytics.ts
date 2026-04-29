@@ -1,4 +1,6 @@
 import adminApi from "../adminClient";
+import { adaptOrder, type ApiOrder } from "../orders";
+import type { ApiProduct } from "../products";
 
 export type RevenueData = {
   today: number;
@@ -14,7 +16,6 @@ export type OrdersByStatus = {
 export type TopProduct = {
   id: number;
   name: string;
-  revenue: number;
   unitsSold: number;
 };
 
@@ -35,60 +36,73 @@ export type LowStockProduct = {
 };
 
 export async function getRevenue(): Promise<RevenueData> {
-  const { data } = await adminApi.get<{
-    today: number;
-    last_7_days: number;
-    last_30_days: number;
-  }>("/api/v1/admin/analytics/revenue");
-  return {
-    today: data.today,
-    last7Days: data.last_7_days,
-    last30Days: data.last_30_days,
-  };
+  const { data } = await adminApi.get<{ date: string; revenue: number }[]>(
+    "/admin/analytics/revenue",
+  );
+  const entries = Array.isArray(data) ? data : [];
+
+  const today = new Date().toISOString().split("T")[0];
+  const d7 = new Date(Date.now() - 7 * 86400000).toISOString().split("T")[0];
+  const d30 = new Date(Date.now() - 30 * 86400000).toISOString().split("T")[0];
+
+  let todayRev = 0;
+  let last7Rev = 0;
+  let last30Rev = 0;
+
+  for (const e of entries) {
+    if (e.date === today) todayRev = e.revenue;
+    if (e.date >= d7) last7Rev += e.revenue;
+    if (e.date >= d30) last30Rev += e.revenue;
+  }
+
+  return { today: todayRev, last7Days: last7Rev, last30Days: last30Rev };
 }
 
 export async function getOrdersByStatus(): Promise<OrdersByStatus> {
   const { data } = await adminApi.get<{ status: string; count: number }[]>(
-    "/api/v1/admin/analytics/orders-by-status",
+    "/admin/analytics/orders-by-status",
   );
   return Array.isArray(data) ? data : [];
 }
 
 export async function getTopProducts(limit = 5): Promise<TopProduct[]> {
-  const { data } = await adminApi.get<
-    { id: number; name: string; revenue: number; units_sold: number }[]
-  >(`/api/v1/admin/analytics/top-products?limit=${limit}`);
+  const { data } = await adminApi.get<{ product: ApiProduct; total_sold: number }[]>(
+    `/admin/analytics/top-products?limit=${limit}`,
+  );
   return Array.isArray(data)
-    ? data.map((p) => ({ id: p.id, name: p.name, revenue: p.revenue, unitsSold: p.units_sold }))
-    : [];
-}
-
-export async function getRecentOrders(): Promise<RecentOrder[]> {
-  const { data } = await adminApi.get<
-    { id: number; status: string; total: number; created_at: string; customer_name: string }[]
-  >("/api/v1/admin/analytics/recent-orders");
-  return Array.isArray(data)
-    ? data.map((o) => ({
-        id: o.id,
-        status: o.status,
-        total: o.total,
-        createdAt: o.created_at,
-        customerName: o.customer_name,
+    ? data.map((p) => ({
+        id: p.product.ID ?? p.product.id ?? 0,
+        name: p.product.Name ?? p.product.name ?? "",
+        unitsSold: p.total_sold,
       }))
     : [];
 }
 
+export async function getRecentOrders(): Promise<RecentOrder[]> {
+  const { data } = await adminApi.get<ApiOrder[]>("/admin/analytics/recent-orders");
+  return Array.isArray(data)
+    ? data.map((o) => {
+        const order = adaptOrder(o);
+        return {
+          id: Number(order.id),
+          status: order.status,
+          total: order.total,
+          createdAt: order.createdAt,
+          customerName: order.user?.name ?? "Guest",
+        };
+      })
+    : [];
+}
+
 export async function getLowStock(): Promise<LowStockProduct[]> {
-  const { data } = await adminApi.get<
-    { id: number; name: string; slug: string; stock: number; low_stock_threshold: number }[]
-  >("/api/v1/admin/analytics/low-stock");
+  const { data } = await adminApi.get<ApiProduct[]>("/admin/analytics/low-stock");
   return Array.isArray(data)
     ? data.map((p) => ({
-        id: p.id,
-        name: p.name,
-        slug: p.slug,
-        stock: p.stock,
-        lowStockThreshold: p.low_stock_threshold,
+        id: p.ID ?? p.id ?? 0,
+        name: p.Name ?? p.name ?? "",
+        slug: p.Slug ?? p.slug ?? "",
+        stock: p.Stock ?? p.stock ?? 0,
+        lowStockThreshold: p.LowStockThreshold ?? p.low_stock_threshold ?? 0,
       }))
     : [];
 }

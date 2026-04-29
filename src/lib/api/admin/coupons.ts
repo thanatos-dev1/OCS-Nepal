@@ -28,20 +28,20 @@ function adaptCoupon(c: ApiCoupon): Coupon {
 }
 
 export async function adminGetCoupons(): Promise<Coupon[]> {
-  const { data } = await adminApi.get<ApiCoupon[]>("/api/v1/admin/coupons");
+  const { data } = await adminApi.get<ApiCoupon[]>("/admin/coupons");
   return Array.isArray(data) ? data.map(adaptCoupon) : [];
 }
 
 export async function adminCreateCoupon(input: CouponInput): Promise<Coupon> {
-  const { data } = await adminApi.post<ApiCoupon>("/api/v1/admin/coupons", input);
+  const { data } = await adminApi.post<ApiCoupon>("/admin/coupons", input);
   return adaptCoupon(data);
 }
 
 export async function adminUpdateCoupon(id: number, input: CouponInput): Promise<Coupon> {
-  const { data } = await adminApi.put<ApiCoupon>(`/api/v1/admin/coupons/${id}`, input);
+  const { data } = await adminApi.put<ApiCoupon>(`/admin/coupons/${id}`, input);
   return adaptCoupon(data);
 }
 
 export async function adminDeleteCoupon(id: number): Promise<void> {
-  await adminApi.delete(`/api/v1/admin/coupons/${id}`);
+  await adminApi.delete(`/admin/coupons/${id}`);
 }

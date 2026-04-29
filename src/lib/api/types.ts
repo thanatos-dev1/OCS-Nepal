@@ -86,7 +86,7 @@ export type OrderStatusLog = {
 
 export type OrderItemSnapshot = {
   name: string;
-  sku: string;
+  brand: string;
   price: number;
   imageUrl: string;
 };
@@ -182,6 +182,7 @@ export type AddressInput = {
 
 // Wishlist
 export type WishlistItem = {
+  id?: number;
   productId: number;
   product: Product;
 };
@@ -192,7 +193,7 @@ export type Review = {
   rating: number;
   title: string;
   body: string;
-  user: { name: string };
+  user: { id?: number; name: string; avatarUrl?: string };
   isVerified: boolean;
   createdAt: string;
 };
@@ -214,6 +215,7 @@ export type Return = {
   status: ReturnStatus;
   notes?: string;
   createdAt: string;
+  resolvedAt?: string | null;
   order?: Partial<Order>;
   item?: Partial<OrderItem>;
 };

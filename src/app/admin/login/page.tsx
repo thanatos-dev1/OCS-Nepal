@@ -31,7 +31,7 @@ export default function AdminLoginPage() {
     setLoading(true);
     try {
       const result = await adminLogin(email.trim(), password);
-      setAdminAuth(result.accessToken, { adminId: result.adminId, role: result.role });
+      setAdminAuth(result.token, { adminId: result.adminId, role: result.role });
       router.replace("/admin/dashboard");
     } catch (err: unknown) {
       const msg = (err as { response?: { data?: { error?: string } } })?.response?.data?.error;

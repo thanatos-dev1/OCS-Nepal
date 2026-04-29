@@ -3,99 +3,99 @@ import type { Order, OrderItem, OrderStatusLog, OrderItemSnapshot } from "./type
 
 type ApiOrderItemSnapshot = {
   name: string;
-  sku: string;
+  brand: string;
   price: number;
   image_url: string;
 };
 
 type ApiOrderItem = {
-  id: number;
-  product_id: number;
-  product_name: string;
-  quantity: number;
-  price: number;
-  snapshot?: ApiOrderItemSnapshot;
+  ID: number;
+  ProductID: number;
+  ProductName: string;
+  Quantity: number;
+  Price: number;
+  Snapshot?: ApiOrderItemSnapshot;
 };
 
 type ApiStatusLog = {
-  from_status: string;
-  to_status: string;
-  note?: string;
-  created_at: string;
+  FromStatus: string;
+  ToStatus: string;
+  Note?: string;
+  CreatedAt: string;
 };
 
-type ApiUser = { id: number; name: string; email: string };
+type ApiUser = { ID: number; Name: string; Email: string };
 
 export type ApiOrder = {
-  id: number;
-  created_at: string;
-  status: string;
-  subtotal: number;
-  shipping_amount: number;
-  total: number;
-  delivery_address: string;
-  phone: string;
-  note?: string;
-  rejection_reason?: string;
-  tracking_number?: string;
-  payment_method?: string;
-  guest_email?: string;
-  shipping_address_id?: number;
-  coupon_code?: string;
-  discount_amount?: number;
-  status_logs?: ApiStatusLog[];
-  items: ApiOrderItem[];
-  user?: ApiUser;
+  ID: number;
+  CreatedAt: string;
+  Status: string;
+  Subtotal: number;
+  ShippingAmount: number;
+  Total: number;
+  DeliveryAddress: string;
+  Phone: string;
+  Note?: string;
+  RejectionReason?: string;
+  TrackingNumber?: string | null;
+  PaymentMethod?: string;
+  GuestEmail?: string | null;
+  ShippingAddressID?: number | null;
+  CouponCode?: string;
+  DiscountAmount?: number;
+  StatusLogs?: ApiStatusLog[];
+  Items?: ApiOrderItem[];
+  User?: ApiUser;
 };
 
 function adaptItem(i: ApiOrderItem): OrderItem {
   let snapshot: OrderItemSnapshot | undefined;
-  if (i.snapshot) {
+  if (i.Snapshot) {
     snapshot = {
-      name: i.snapshot.name,
-      sku: i.snapshot.sku,
-      price: i.snapshot.price,
-      imageUrl: i.snapshot.image_url,
+      name: i.Snapshot.name,
+      brand: i.Snapshot.brand,
+      price: i.Snapshot.price,
+      imageUrl: i.Snapshot.image_url,
     };
   }
   return {
-    id: String(i.id),
-    productId: String(i.product_id),
-    productName: i.product_name,
-    name: i.product_name,
-    price: i.price,
-    qty: i.quantity,
+    id: String(i.ID),
+    productId: String(i.ProductID),
+    productName: i.ProductName,
+    name: i.ProductName,
+    price: i.Price,
+    qty: i.Quantity,
     snapshot,
   };
 }
 
 export function adaptOrder(o: ApiOrder): Order {
-  const statusLogs: OrderStatusLog[] = (o.status_logs ?? []).map((l) => ({
-    fromStatus: l.from_status,
-    toStatus: l.to_status,
-    note: l.note,
-    createdAt: l.created_at,
+  const statusLogs: OrderStatusLog[] = (o.StatusLogs ?? []).map((l) => ({
+    fromStatus: l.FromStatus,
+    toStatus: l.ToStatus,
+    note: l.Note,
+    createdAt: l.CreatedAt,
   }));
 
   return {
-    id: String(o.id),
-    status: o.status as Order["status"],
-    total: o.total,
-    subtotal: o.subtotal ?? o.total,
-    shippingAmount: o.shipping_amount ?? 0,
-    createdAt: o.created_at,
-    deliveryAddress: o.delivery_address,
-    phone: o.phone,
-    note: o.note,
-    rejectionReason: o.rejection_reason,
-    trackingNumber: o.tracking_number,
-    guestEmail: o.guest_email,
-    shippingAddressId: o.shipping_address_id,
-    couponCode: o.coupon_code,
-    discountAmount: o.discount_amount,
+    id: String(o.ID),
+    status: o.Status as Order["status"],
+    total: o.Total,
+    subtotal: o.Subtotal ?? o.Total,
+    shippingAmount: o.ShippingAmount ?? 0,
+    createdAt: o.CreatedAt,
+    deliveryAddress: o.DeliveryAddress,
+    phone: o.Phone,
+    note: o.Note,
+    rejectionReason: o.RejectionReason,
+    trackingNumber: o.TrackingNumber ?? undefined,
+    guestEmail: o.GuestEmail ?? undefined,
+    shippingAddressId: o.ShippingAddressID ?? undefined,
+    couponCode: o.CouponCode,
+    discountAmount: o.DiscountAmount,
     statusLogs,
-    items: (o.items ?? []).map(adaptItem),
-    user: o.user ? { id: o.user.id, name: o.user.name, email: o.user.email } : undefined,
+    items: (o.Items ?? []).map(adaptItem),
+    user: o.User ? { id: o.User.ID, name: o.User.Name, email: o.User.Email } : undefined,
   };
 }
 
@@ -121,17 +121,21 @@ export async function createOrder(payload: {
 
 export async function createGuestOrder(payload: {
   guestEmail: string;
+  deliveryAddress: string;
+  phone: string;
   items: { product_id: number; quantity: number }[];
-  paymentMethod?: string;
   couponCode?: string;
   note?: string;
+  paymentMethod?: string;
 }): Promise<Order> {
   const { data } = await api.post<ApiOrder>("/orders/guest", {
     guest_email: payload.guestEmail,
+    delivery_address: payload.deliveryAddress,
+    phone: payload.phone,
     items: payload.items,
-    payment_method: payload.paymentMethod ?? "cod",
     coupon_code: payload.couponCode,
     note: payload.note,
+    payment_method: payload.paymentMethod ?? "cod",
   });
   return adaptOrder(data);
 }
@@ -185,4 +189,42 @@ export async function requestReturn(
   reason: string,
 ): Promise<void> {
   await api.post(`/orders/${orderId}/returns`, { order_item_id: orderItemId, reason });
+}
+
+type ApiMyReturn = {
+  ID: number;
+  OrderID: number;
+  OrderItemID: number;
+  Reason: string;
+  Status: "pending" | "approved" | "rejected";
+  Notes?: string;
+  CreatedAt: string;
+  ResolvedAt?: string | null;
+};
+
+export type MyReturn = {
+  id: number;
+  orderId: string;
+  orderItemId: number;
+  reason: string;
+  status: "pending" | "approved" | "rejected";
+  notes?: string;
+  createdAt: string;
+  resolvedAt?: string | null;
+};
+
+export async function getMyReturns(): Promise<MyReturn[]> {
+  const { data } = await api.get<ApiMyReturn[]>("/me/returns");
+  return Array.isArray(data)
+    ? data.map((r) => ({
+        id: r.ID,
+        orderId: String(r.OrderID),
+        orderItemId: r.OrderItemID,
+        reason: r.Reason,
+        status: r.Status,
+        notes: r.Notes,
+        createdAt: r.CreatedAt,
+        resolvedAt: r.ResolvedAt,
+      }))
+    : [];
 }

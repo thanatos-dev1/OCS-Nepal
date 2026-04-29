@@ -20,17 +20,20 @@ import { formatNPR } from "@/lib/utils";
 type CheckoutMode = "auth" | "guest";
 type AddressMode = "saved" | "new";
 
-type FieldErrors = Partial<Record<"name" | "phone" | "address" | "email", string>>;
+type FieldErrors = Partial<Record<"name" | "phone" | "address" | "email" | "guestPhone" | "guestAddress", string>>;
 
 function validateFields(
   mode: CheckoutMode,
   addressMode: AddressMode,
-  fields: { name: string; phone: string; address: string; email: string },
+  fields: { name: string; phone: string; address: string; email: string; guestPhone: string; guestAddress: string },
 ): FieldErrors {
   const errs: FieldErrors = {};
   if (mode === "guest") {
     if (!fields.email.trim()) errs.email = "Required";
     else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(fields.email)) errs.email = "Invalid email";
+    if (!fields.guestPhone.trim()) errs.guestPhone = "Required";
+    else if (!/^\d{10}$/.test(fields.guestPhone.trim())) errs.guestPhone = "Must be 10 digits";
+    if (!fields.guestAddress.trim()) errs.guestAddress = "Required";
   } else {
     if (!fields.name.trim()) errs.name = "Required";
     if (!fields.phone.trim()) errs.phone = "Required";
@@ -75,6 +78,8 @@ export default function CheckoutPage() {
   const [phone, setPhone] = useState(user?.phone ?? "");
   const [address, setAddress] = useState("");
   const [guestEmail, setGuestEmail] = useState("");
+  const [guestPhone, setGuestPhone] = useState("");
+  const [guestAddress, setGuestAddress] = useState("");
   const [note, setNote] = useState("");
   const [errors, setErrors] = useState<FieldErrors>({});
   const [apiError, setApiError] = useState("");
@@ -140,6 +145,8 @@ export default function CheckoutPage() {
       phone,
       address,
       email: guestEmail,
+      guestPhone,
+      guestAddress,
     });
     if (Object.keys(errs).length > 0) { setErrors(errs); return; }
     setErrors({});
@@ -147,7 +154,9 @@ export default function CheckoutPage() {
     try {
       if (checkoutMode === "guest") {
         await placeGuestOrder.mutateAsync({
-          guestEmail: guestEmail.trim(),
+          email: guestEmail.trim(),
+          deliveryAddress: guestAddress.trim(),
+          phone: guestPhone.trim(),
           items: items.map((i) => ({ product_id: parseInt(i.productId as unknown as string, 10), quantity: i.quantity })),
           couponCode: couponCode || undefined,
           note: note.trim() || undefined,
@@ -228,6 +237,22 @@ export default function CheckoutPage() {
                   onChange={(e) => { setGuestEmail(e.target.value); setErrors((p) => ({ ...p, email: undefined })); }}
                   error={errors.email}
                   placeholder="you@example.com"
+                />
+                <Input
+                  id="guest-phone"
+                  label="Phone Number"
+                  type="tel"
+                  value={guestPhone}
+                  onChange={(e) => { setGuestPhone(e.target.value); setErrors((p) => ({ ...p, guestPhone: undefined })); }}
+                  error={errors.guestPhone}
+                  placeholder="98XXXXXXXX"
+                />
+                <AddressAutocomplete
+                  label="Delivery Address"
+                  value={guestAddress}
+                  onChange={(v) => { setGuestAddress(v); setErrors((p) => ({ ...p, guestAddress: undefined })); }}
+                  error={errors.guestAddress}
+                  placeholder="Search your area, street…"
                 />
               </div>
             ) : (

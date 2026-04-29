@@ -11,24 +11,22 @@ export async function adminGetProducts(params?: {
   if (params?.q) query.q = params.q;
   if (params?.category_id) query.category_id = params.category_id;
   if (params?.include_inactive) query.include_inactive = "true";
-  const { data } = await adminApi.get<ApiProduct[]>("/api/v1/products", { params: query });
+  const { data } = await adminApi.get<ApiProduct[]>("/products", { params: query });
   return Array.isArray(data) ? data.map(adaptProduct) : [];
 }
 
-export async function adminUpdateStock(id: number, quantity: number): Promise<Product> {
-  const { data } = await adminApi.patch<ApiProduct>(`/api/v1/admin/products/${id}/stock`, {
-    quantity,
-  });
+export async function adminUpdateStock(id: number, stock: number): Promise<Product> {
+  const { data } = await adminApi.patch<ApiProduct>(`/admin/products/${id}/stock`, { stock });
   return adaptProduct(data);
 }
 
 export async function adminUpdateProduct(id: number, input: ProductInput): Promise<Product> {
-  const { data } = await adminApi.put<ApiProduct>(`/api/v1/products/${id}`, input);
+  const { data } = await adminApi.put<ApiProduct>(`/products/${id}`, input);
   return adaptProduct(data);
 }
 
 export async function adminDeleteProduct(id: number): Promise<void> {
-  await adminApi.delete(`/api/v1/products/${id}`);
+  await adminApi.delete(`/products/${id}`);
 }
 
 export async function adminToggleFlag(
@@ -36,7 +34,7 @@ export async function adminToggleFlag(
   flag: "is_featured" | "is_new_arrival" | "is_active",
   value: boolean,
 ): Promise<Product> {
-  const { data } = await adminApi.patch<ApiProduct>(`/api/v1/products/${id}`, { [flag]: value });
+  const { data } = await adminApi.patch<ApiProduct>(`/products/${id}`, { [flag]: value });
   return adaptProduct(data);
 }
 
@@ -44,5 +42,5 @@ export async function adminUpdateSpecs(
   productId: number,
   specs: { key: string; value: string; sort_order: number }[],
 ): Promise<void> {
-  await adminApi.put(`/api/v1/products/${productId}/specs`, specs);
+  await adminApi.put(`/products/${productId}/specs`, specs);
 }

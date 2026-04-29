@@ -139,8 +139,8 @@ export async function deleteProduct(id: number): Promise<void> {
   await api.delete(`/products/${id}`);
 }
 
-export async function updateStock(id: number, quantity: number): Promise<Product> {
-  const { data } = await api.patch<ApiProduct>(`/admin/products/${id}/stock`, { quantity });
+export async function updateStock(id: number, stock: number): Promise<Product> {
+  const { data } = await api.patch<ApiProduct>(`/admin/products/${id}/stock`, { stock });
   return adaptProduct(data);
 }
 

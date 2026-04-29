@@ -169,16 +169,14 @@ export default function AdminDashboardPage() {
             <thead>
               <tr className="text-text-muted text-xs border-b border-border">
                 <th className="text-left pb-2 font-medium">Product</th>
-                <th className="text-right pb-2 font-medium">Sold</th>
-                <th className="text-right pb-2 font-medium">Revenue</th>
+                <th className="text-right pb-2 font-medium">Units Sold</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-border">
               {topProducts.map((p) => (
                 <tr key={p.id}>
-                  <td className="py-2.5 text-text truncate max-w-32">{p.name}</td>
-                  <td className="py-2.5 text-right text-text-muted">{p.unitsSold}</td>
-                  <td className="py-2.5 text-right font-medium text-text">{formatNPR(p.revenue)}</td>
+                  <td className="py-2.5 text-text truncate max-w-40">{p.name}</td>
+                  <td className="py-2.5 text-right font-medium text-text">{p.unitsSold}</td>
                 </tr>
               ))}
               {topProducts.length === 0 && (
