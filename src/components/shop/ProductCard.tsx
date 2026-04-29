@@ -7,7 +7,7 @@ import { Heart } from "lucide-react";
 import Button from "@/components/ui/Button";
 import Badge from "@/components/ui/Badge";
 import ProductImage from "@/components/shop/ProductImage";
-import { cn } from "@/lib/utils";
+import { cn, formatNPR } from "@/lib/utils";
 import type { Product } from "@/lib/api/types";
 import { useAddToCartMutation, useCartQuery } from "@/hooks/useCart";
 import { useAuthStore } from "@/stores/authStore";
@@ -16,10 +16,6 @@ import {
   useAddToWishlistMutation,
   useRemoveFromWishlistMutation,
 } from "@/hooks/useWishlist";
-
-function formatNPR(amount: number) {
-  return `NPR ${amount.toLocaleString("en-IN")}`;
-}
 
 interface ProductCardProps {
   product: Product;

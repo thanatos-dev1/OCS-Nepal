@@ -40,15 +40,15 @@ export function useSaveProductMutation(editingProduct: Product | null) {
           imageUrl = await uploadImage(imageFile);
         }
         await updateProduct(id, {
-          name: form.get("name") as string,
-          price: parseFloat(form.get("price") as string),
-          stock: form.get("stock") ? parseInt(form.get("stock") as string, 10) : undefined,
-          description: (form.get("description") as string) || undefined,
-          brand: (form.get("brand") as string) || undefined,
-          category_id: form.get("category_id") ? parseInt(form.get("category_id") as string, 10) : undefined,
-          is_featured: form.get("is_featured") === "true",
-          is_new_arrival: form.get("is_new_arrival") === "true",
-          sale_price: form.get("sale_price") ? parseFloat(form.get("sale_price") as string) : undefined,
+          Name: form.get("name") as string,
+          Price: parseFloat(form.get("price") as string),
+          Stock: form.get("stock") ? parseInt(form.get("stock") as string, 10) : undefined,
+          Description: (form.get("description") as string) || undefined,
+          Brand: (form.get("brand") as string) || undefined,
+          CategoryID: form.get("category_id") ? parseInt(form.get("category_id") as string, 10) : undefined,
+          IsFeatured: form.get("is_featured") === "true",
+          IsNewArrival: form.get("is_new_arrival") === "true",
+          SalePrice: form.get("sale_price") ? parseFloat(form.get("sale_price") as string) : undefined,
         });
       } else {
         const imageFile = form.get("image");
@@ -56,12 +56,12 @@ export function useSaveProductMutation(editingProduct: Product | null) {
           await createProductWithImage(form);
         } else {
           await createProduct({
-            name: form.get("name") as string,
-            price: parseFloat(form.get("price") as string),
-            stock: form.get("stock") ? parseInt(form.get("stock") as string, 10) : undefined,
-            description: (form.get("description") as string) || undefined,
-            brand: (form.get("brand") as string) || undefined,
-            category_id: form.get("category_id") ? parseInt(form.get("category_id") as string, 10) : undefined,
+            Name: form.get("name") as string,
+            Price: parseFloat(form.get("price") as string),
+            Stock: form.get("stock") ? parseInt(form.get("stock") as string, 10) : undefined,
+            Description: (form.get("description") as string) || undefined,
+            Brand: (form.get("brand") as string) || undefined,
+            CategoryID: form.get("category_id") ? parseInt(form.get("category_id") as string, 10) : undefined,
           });
         }
       }

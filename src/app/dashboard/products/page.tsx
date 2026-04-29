@@ -99,7 +99,7 @@ export default function AdminProductsPage() {
                     </div>
                   </td>
                   <td className="px-4 py-3 text-text-muted">{p.category || "—"}</td>
-                  <td className="px-4 py-3 text-text">NPR {p.price.toLocaleString("en-IN")}</td>
+                  <td className="px-4 py-3 text-text">NPR {(p.price ?? 0).toLocaleString("en-IN")}</td>
                   <td className="px-4 py-3">
                     <span className={p.inStock ? "text-success" : "text-error"}>{p.stockCount}</span>
                   </td>

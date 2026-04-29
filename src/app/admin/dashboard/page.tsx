@@ -10,10 +10,7 @@ import {
   getLowStock,
 } from "@/lib/api/admin/analytics";
 import { queryKeys } from "@/lib/queries";
-
-function formatNPR(amount: number) {
-  return `NPR ${amount.toLocaleString("en-IN")}`;
-}
+import { formatNPR } from "@/lib/utils";
 
 const STATUS_COLORS: Record<string, string> = {
   pending: "bg-amber-500",

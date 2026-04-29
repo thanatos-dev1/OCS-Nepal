@@ -17,12 +17,8 @@ import {
   useRemoveFromWishlistMutation,
 } from "@/hooks/useWishlist";
 import { useAuthStore } from "@/stores/authStore";
-import { cn } from "@/lib/utils";
+import { cn, formatNPR } from "@/lib/utils";
 import { useRouter } from "next/navigation";
-
-function formatNPR(amount: number) {
-  return `NPR ${amount.toLocaleString("en-IN")}`;
-}
 
 function StarRating({ rating, size = 16 }: { rating: number; size?: number }) {
   return (

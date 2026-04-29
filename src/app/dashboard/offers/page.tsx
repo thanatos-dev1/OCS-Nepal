@@ -8,10 +8,7 @@ import ConfirmDialog from "@/components/admin/ConfirmDialog";
 import { useOffersQuery, useSaveOfferMutation, useDeleteOfferMutation } from "@/hooks/useOffers";
 import { useProductsQuery } from "@/hooks/useProducts";
 import type { Offer } from "@/lib/api/types";
-
-function formatNPR(n: number) {
-  return `NPR ${n.toLocaleString("en-IN")}`;
-}
+import { formatNPR } from "@/lib/utils";
 
 function formatDate(iso?: string) {
   if (!iso) return "—";

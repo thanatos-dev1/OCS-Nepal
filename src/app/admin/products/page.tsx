@@ -9,10 +9,7 @@ import Input from "@/components/ui/Input";
 import Button from "@/components/ui/Button";
 import type { Product } from "@/lib/api/types";
 import { useAdminAuthStore } from "@/stores/adminAuthStore";
-
-function formatNPR(amount: number) {
-  return `NPR ${amount.toLocaleString("en-IN")}`;
-}
+import { formatNPR } from "@/lib/utils";
 
 function StockEditor({ product }: { product: Product }) {
   const qc = useQueryClient();

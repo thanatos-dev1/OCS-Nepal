@@ -5,10 +5,7 @@ import Link from "next/link";
 import { Users, Search, ChevronRight, ShieldOff, Shield } from "lucide-react";
 import { useCustomersQuery, useToggleBlockMutation } from "@/hooks/useCustomers";
 import type { Customer } from "@/lib/api/types";
-
-function formatNPR(n: number) {
-  return `NPR ${n.toLocaleString("en-IN")}`;
-}
+import { formatNPR } from "@/lib/utils";
 
 function formatDate(iso: string) {
   return new Date(iso).toLocaleDateString("en-IN", { year: "numeric", month: "short", day: "numeric" });

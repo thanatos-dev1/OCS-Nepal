@@ -18,10 +18,7 @@ import Button from "@/components/ui/Button";
 import { useAuthStore } from "@/stores/authStore";
 import { useOrdersQuery, useRequestReturnMutation } from "@/hooks/useOrders";
 import type { Order, OrderItem } from "@/lib/api/types";
-
-function formatNPR(amount: number) {
-  return `NPR ${amount.toLocaleString("en-IN")}`;
-}
+import { formatNPR } from "@/lib/utils";
 
 function formatDate(iso: string) {
   return new Date(iso).toLocaleDateString("en-IN", {

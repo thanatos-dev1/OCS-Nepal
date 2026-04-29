@@ -7,10 +7,7 @@ import CouponModal from "@/components/admin/CouponModal";
 import ConfirmDialog from "@/components/admin/ConfirmDialog";
 import { useCouponsQuery, useSaveCouponMutation, useDeleteCouponMutation } from "@/hooks/useCoupons";
 import type { Coupon } from "@/lib/api/types";
-
-function formatNPR(n: number) {
-  return `NPR ${n.toLocaleString("en-IN")}`;
-}
+import { formatNPR } from "@/lib/utils";
 
 function formatDate(iso?: string) {
   if (!iso) return "—";

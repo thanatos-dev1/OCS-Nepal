@@ -5,6 +5,7 @@ import Link from "next/link";
 import { ArrowLeft, Shield, ShieldOff, Package } from "lucide-react";
 import Button from "@/components/ui/Button";
 import { useCustomerQuery, useCustomerOrdersQuery, useToggleBlockMutation } from "@/hooks/useCustomers";
+import { formatNPR } from "@/lib/utils";
 
 const STATUS_STYLES: Record<string, string> = {
   pending: "bg-amber-100 text-amber-700",
@@ -21,10 +22,6 @@ const STATUS_LABELS: Record<string, string> = {
   delivered: "Delivered",
   cancelled: "Cancelled",
 };
-
-function formatNPR(n: number) {
-  return `NPR ${n.toLocaleString("en-IN")}`;
-}
 
 function formatDate(iso: string) {
   return new Date(iso).toLocaleDateString("en-IN", { year: "numeric", month: "short", day: "numeric" });

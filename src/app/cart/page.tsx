@@ -8,10 +8,7 @@ import { useCartQuery, useUpdateCartItemMutation, useRemoveCartItemMutation, use
 import { useAuthStore } from "@/stores/authStore";
 import Button from "@/components/ui/Button";
 import ProductImage from "@/components/shop/ProductImage";
-
-function formatNPR(amount: number) {
-  return `NPR ${amount.toLocaleString("en-IN")}`;
-}
+import { formatNPR } from "@/lib/utils";
 
 export default function CartPage() {
   const router = useRouter();

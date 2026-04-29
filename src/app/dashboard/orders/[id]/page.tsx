@@ -15,6 +15,7 @@ import {
   useRejectOrderMutation,
   useUpdateTrackingMutation,
 } from "@/hooks/useOrders";
+import { formatNPR } from "@/lib/utils";
 
 const STATUS_STYLES: Record<string, string> = {
   pending: "bg-amber-100 text-amber-700",
@@ -33,10 +34,6 @@ const STATUS_LABELS: Record<string, string> = {
 };
 
 const STEPS = ["pending", "confirmed", "out_for_delivery", "delivered"] as const;
-
-function formatNPR(n: number) {
-  return `NPR ${n.toLocaleString("en-IN")}`;
-}
 
 function formatDate(iso: string) {
   return new Date(iso).toLocaleDateString("en-IN", {

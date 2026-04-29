@@ -8,10 +8,7 @@ import { queryKeys } from "@/lib/queries";
 import Button from "@/components/ui/Button";
 import Input from "@/components/ui/Input";
 import type { Coupon, CouponInput } from "@/lib/api/types";
-
-function formatNPR(amount: number) {
-  return `NPR ${amount.toLocaleString("en-IN")}`;
-}
+import { formatNPR } from "@/lib/utils";
 
 const EMPTY: CouponInput = {
   code: "",

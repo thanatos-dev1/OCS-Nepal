@@ -11,10 +11,7 @@ import {
   useRejectOrderMutation,
 } from "@/hooks/useOrders";
 import type { Order } from "@/lib/api/types";
-
-function formatNPR(amount: number) {
-  return `NPR ${amount.toLocaleString("en-IN")}`;
-}
+import { formatNPR } from "@/lib/utils";
 
 function formatDate(iso: string) {
   return new Date(iso).toLocaleDateString("en-IN", { year: "numeric", month: "short", day: "numeric" });

@@ -2,29 +2,29 @@ import type { Category } from "./types";
 import api from "./client";
 
 type ApiCategory = {
-  id: number;
-  name: string;
-  slug: string;
-  description?: string;
-  sort_order?: number;
-  parent_id?: number | null;
-  product_count?: number;
-  show_in_bar?: boolean;
-  icon?: string;
-  children?: ApiCategory[];
+  ID: number;
+  Name: string;
+  Slug: string;
+  Description?: string;
+  SortOrder?: number;
+  ParentID?: number | null;
+  ProductCount?: number;
+  ShowInBar?: boolean;
+  Icon?: string;
+  Children?: ApiCategory[];
 };
 
 function adaptCategory(c: ApiCategory): Category {
   return {
-    id: String(c.id),
-    name: c.name,
-    slug: c.slug,
-    icon: c.icon ?? "",
-    description: c.description ?? "",
-    sortOrder: c.sort_order ?? 0,
-    parentId: c.parent_id != null ? String(c.parent_id) : null,
-    productCount: c.product_count ?? 0,
-    showInBar: c.show_in_bar ?? false,
+    id: String(c.ID),
+    name: c.Name,
+    slug: c.Slug,
+    icon: c.Icon ?? "",
+    description: c.Description ?? "",
+    sortOrder: c.SortOrder ?? 0,
+    parentId: c.ParentID != null ? String(c.ParentID) : null,
+    productCount: c.ProductCount ?? 0,
+    showInBar: c.ShowInBar ?? false,
   };
 }
 
@@ -45,11 +45,11 @@ export async function getCategoryBySlug(slug: string): Promise<Category | null> 
 }
 
 export type CategoryInput = {
-  name: string;
-  show_in_bar: boolean;
-  description?: string;
-  sort_order?: number;
-  parent_id?: number | null;
+  Name: string;
+  ShowInBar: boolean;
+  Description?: string;
+  SortOrder?: number;
+  ParentID?: number | null;
 };
 
 // --- Owner endpoints ---

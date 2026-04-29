@@ -10,6 +10,8 @@ export default async function CategoryGrid() {
     return null;
   }
 
+  if (categories.length === 0) return null;
+
   return (
     <section className="bg-bg-subtle py-16">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">

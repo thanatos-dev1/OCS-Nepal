@@ -9,10 +9,7 @@ import Button from "@/components/ui/Button";
 import { useAuthStore } from "@/stores/authStore";
 import { useWishlistQuery, useRemoveFromWishlistMutation } from "@/hooks/useWishlist";
 import { useAddToCartMutation, useCartQuery } from "@/hooks/useCart";
-
-function formatNPR(amount: number) {
-  return `NPR ${amount.toLocaleString("en-IN")}`;
-}
+import { formatNPR } from "@/lib/utils";
 
 export default function WishlistPage() {
   const router = useRouter();

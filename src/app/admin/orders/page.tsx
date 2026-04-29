@@ -14,10 +14,7 @@ import {
 import { queryKeys } from "@/lib/queries";
 import Button from "@/components/ui/Button";
 import type { Order } from "@/lib/api/types";
-
-function formatNPR(amount: number) {
-  return `NPR ${amount.toLocaleString("en-IN")}`;
-}
+import { formatNPR } from "@/lib/utils";
 
 function formatDate(iso: string) {
   return new Date(iso).toLocaleString("en-IN", { dateStyle: "medium", timeStyle: "short" });

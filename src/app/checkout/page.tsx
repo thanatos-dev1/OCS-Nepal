@@ -15,10 +15,7 @@ import { useUpdateProfileMutation } from "@/hooks/useProfile";
 import { useAddressesQuery } from "@/hooks/useAddresses";
 import { validateCoupon } from "@/lib/api/coupons";
 import type { Address } from "@/lib/api/types";
-
-function formatNPR(amount: number) {
-  return `NPR ${amount.toLocaleString("en-IN")}`;
-}
+import { formatNPR } from "@/lib/utils";
 
 type CheckoutMode = "auth" | "guest";
 type AddressMode = "saved" | "new";

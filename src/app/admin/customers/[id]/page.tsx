@@ -6,10 +6,7 @@ import Link from "next/link";
 import { ArrowLeft } from "lucide-react";
 import { adminGetCustomer, adminGetCustomerOrders } from "@/lib/api/admin/customers";
 import { queryKeys } from "@/lib/queries";
-
-function formatNPR(amount: number) {
-  return `NPR ${amount.toLocaleString("en-IN")}`;
-}
+import { formatNPR } from "@/lib/utils";
 
 function formatDate(iso: string) {
   return new Date(iso).toLocaleDateString("en-IN", { dateStyle: "medium" });

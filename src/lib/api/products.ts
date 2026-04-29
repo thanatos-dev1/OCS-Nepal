@@ -1,92 +1,52 @@
 import type { Product, ProductImage, ProductSpec } from "./types";
 import api from "./client";
 
-// New snake_case API shape from Go backend
-type ApiProductImage = {
-  id: number;
-  url: string;
-  alt_text: string;
-  is_primary: boolean;
-  sort_order: number;
-};
-
-type ApiProductSpec = {
-  key: string;
-  value: string;
-  sort_order: number;
-};
-
-export type ApiProduct = {
-  id: number;
-  name: string;
-  slug: string;
-  price: number;
-  brand?: string;
-  category_id?: number;
-  description?: string;
-  stock?: number;
-  low_stock_threshold?: number;
-  category?: { id: number; name: string; slug: string };
-  is_featured?: boolean;
-  is_new_arrival?: boolean;
-  is_active?: boolean;
-  sale_price?: number | null;
-  images?: ApiProductImage[];
-  specs?: ApiProductSpec[];
-};
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+export type ApiProduct = Record<string, any>;
 
 export type ProductInput = {
-  name: string;
-  price: number;
-  description?: string;
-  stock?: number;
-  brand?: string;
-  category_id?: number;
-  is_featured?: boolean;
-  is_new_arrival?: boolean;
-  is_active?: boolean;
-  sale_price?: number;
-  low_stock_threshold?: number;
+  Name: string;
+  Price: number;
+  Description?: string;
+  Stock?: number;
+  Brand?: string;
+  CategoryID?: number;
+  IsFeatured?: boolean;
+  IsNewArrival?: boolean;
+  IsActive?: boolean;
+  SalePrice?: number;
 };
 
 export function adaptProduct(p: ApiProduct): Product {
-  const images: ProductImage[] = (p.images ?? [])
-    .sort((a, b) => {
-      if (a.is_primary && !b.is_primary) return -1;
-      if (!a.is_primary && b.is_primary) return 1;
-      return a.sort_order - b.sort_order;
-    })
-    .map((img) => ({
-      id: img.id,
-      url: img.url,
-      altText: img.alt_text,
-      isPrimary: img.is_primary,
-      sortOrder: img.sort_order,
-    }));
-
-  const specs: ProductSpec[] = (p.specs ?? [])
-    .sort((a, b) => a.sort_order - b.sort_order)
-    .map((s) => ({ key: s.key, value: s.value, sortOrder: s.sort_order }));
+  const id = p.ID ?? p.id;
+  const name = p.Name ?? p.name ?? "";
+  const slug = p.Slug ?? p.slug ?? name.toLowerCase().replace(/\s+/g, "-");
+  const price = p.Price ?? p.price ?? 0;
+  const stock = p.StockCount ?? p.stock_count ?? p.Stock ?? p.stock ?? 0;
+  const imageUrl: string | undefined = p.ImageURL ?? p.image_url;
+  const images: ProductImage[] = imageUrl
+    ? [{ id: 0, url: imageUrl, altText: name, isPrimary: true, sortOrder: 0 }]
+    : [];
 
   return {
-    id: String(p.id),
-    name: p.name,
-    slug: p.slug,
-    price: p.price,
-    brand: p.brand,
-    description: p.description ?? "",
+    id: String(id),
+    name,
+    slug,
+    price,
+    brand: p.Brand ?? p.brand,
+    description: p.Description ?? p.description ?? "",
     images,
-    inStock: (p.stock ?? 0) > 0,
-    stockCount: p.stock ?? 0,
-    lowStockThreshold: p.low_stock_threshold ?? 5,
-    categoryId: String(p.category_id ?? ""),
-    category: p.category?.name ?? "",
-    categorySlug: p.category?.slug ?? "",
-    specs,
-    isFeatured: p.is_featured ?? false,
-    isNewArrival: p.is_new_arrival ?? false,
-    isActive: p.is_active ?? true,
-    salePrice: p.sale_price ?? undefined,
+    inStock: p.InStock ?? p.in_stock ?? stock > 0,
+    stockCount: stock,
+    lowStockThreshold: p.LowStockThreshold ?? p.low_stock_threshold ?? 5,
+    categoryId: String(p.CategoryID ?? p.category_id ?? (typeof p.Category === "object" ? p.Category?.ID ?? p.Category?.id : "") ?? ""),
+    category: typeof p.Category === "object" ? (p.Category?.Name ?? p.Category?.name ?? "") : (p.Category ?? p.category?.name ?? p.category ?? ""),
+    categorySlug: typeof p.Category === "object" ? (p.Category?.Slug ?? p.Category?.slug ?? "") : (p.CategorySlug ?? p.category?.slug ?? ""),
+    specs: [],
+    isFeatured: p.IsFeatured ?? p.is_featured ?? false,
+    isNewArrival: p.IsNewArrival ?? p.is_new_arrival ?? false,
+    isActive: p.IsActive ?? p.is_active ?? true,
+    salePrice: p.SalePrice ?? p.sale_price ?? undefined,
   };
 }
 
@@ -198,17 +158,17 @@ export async function uploadProductImage(
   productId: number,
   form: FormData,
 ): Promise<ProductImage> {
-  const { data } = await api.post<ApiProductImage>(
+  const { data } = await api.post<ApiProduct>(
     `/products/${productId}/images`,
     form,
     { headers: { "Content-Type": "multipart/form-data" } },
   );
   return {
-    id: data.id,
-    url: data.url,
-    altText: data.alt_text,
-    isPrimary: data.is_primary,
-    sortOrder: data.sort_order,
+    id: data.ID ?? data.id ?? 0,
+    url: data.URL ?? data.url ?? "",
+    altText: data.AltText ?? data.alt_text ?? "",
+    isPrimary: data.IsPrimary ?? data.is_primary ?? false,
+    sortOrder: data.SortOrder ?? data.sort_order ?? 0,
   };
 }
 

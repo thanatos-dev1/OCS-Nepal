@@ -7,10 +7,7 @@ import { Search, ShieldOff, ShieldCheck } from "lucide-react";
 import { adminGetCustomers, adminBlockCustomer, adminUnblockCustomer } from "@/lib/api/admin/customers";
 import { queryKeys } from "@/lib/queries";
 import Button from "@/components/ui/Button";
-
-function formatNPR(amount: number) {
-  return `NPR ${amount.toLocaleString("en-IN")}`;
-}
+import { formatNPR } from "@/lib/utils";
 
 export default function AdminCustomersPage() {
   const qc = useQueryClient();
