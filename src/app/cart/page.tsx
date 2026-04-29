@@ -10,7 +10,7 @@ import Button from "@/components/ui/Button";
 import ProductImage from "@/components/shop/ProductImage";
 
 function formatNPR(amount: number) {
-  return `NPR ${amount.toLocaleString("en-NP")}`;
+  return `NPR ${amount.toLocaleString("en-IN")}`;
 }
 
 export default function CartPage() {

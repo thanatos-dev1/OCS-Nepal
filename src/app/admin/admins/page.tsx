@@ -13,7 +13,7 @@ import { useAdminAuthStore } from "@/stores/adminAuthStore";
 const ROLES: AdminRole[] = ["super_admin", "manager", "staff"];
 
 function formatDate(iso: string) {
-  return new Date(iso).toLocaleString("en-NP", { dateStyle: "medium", timeStyle: "short" });
+  return new Date(iso).toLocaleString("en-IN", { dateStyle: "medium", timeStyle: "short" });
 }
 
 export default function AdminManagementPage() {

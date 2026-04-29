@@ -9,12 +9,12 @@ import { useCouponsQuery, useSaveCouponMutation, useDeleteCouponMutation } from 
 import type { Coupon } from "@/lib/api/types";
 
 function formatNPR(n: number) {
-  return `NPR ${n.toLocaleString("en-NP")}`;
+  return `NPR ${n.toLocaleString("en-IN")}`;
 }
 
 function formatDate(iso?: string) {
   if (!iso) return "—";
-  return new Date(iso).toLocaleDateString("en-NP", { day: "numeric", month: "short", year: "numeric" });
+  return new Date(iso).toLocaleDateString("en-IN", { day: "numeric", month: "short", year: "numeric" });
 }
 
 const TableSkeleton = () => (

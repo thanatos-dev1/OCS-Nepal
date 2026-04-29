@@ -19,7 +19,7 @@ export default async function BudgetPicks() {
             </div>
             <div>
               <h2 className="text-2xl font-bold text-text">
-                Under NPR {MAX_PRICE.toLocaleString("en-NP")}
+                Under NPR {MAX_PRICE.toLocaleString("en-IN")}
               </h2>
               <p className="text-sm text-text-muted mt-1">Great picks on a budget</p>
             </div>

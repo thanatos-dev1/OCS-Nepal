@@ -86,7 +86,7 @@ export default function OfferModal({ initial, products, onSave, onClose }: Props
               <option value="">— Select product —</option>
               {products.map((p) => (
                 <option key={p.id} value={p.id}>
-                  {p.name} — NPR {p.price.toLocaleString("en-NP")}
+                  {p.name} — NPR {p.price.toLocaleString("en-IN")}
                 </option>
               ))}
             </select>

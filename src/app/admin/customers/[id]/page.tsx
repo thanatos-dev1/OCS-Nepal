@@ -8,11 +8,11 @@ import { adminGetCustomer, adminGetCustomerOrders } from "@/lib/api/admin/custom
 import { queryKeys } from "@/lib/queries";
 
 function formatNPR(amount: number) {
-  return `NPR ${amount.toLocaleString("en-NP")}`;
+  return `NPR ${amount.toLocaleString("en-IN")}`;
 }
 
 function formatDate(iso: string) {
-  return new Date(iso).toLocaleDateString("en-NP", { dateStyle: "medium" });
+  return new Date(iso).toLocaleDateString("en-IN", { dateStyle: "medium" });
 }
 
 const STATUS_STYLES: Record<string, string> = {

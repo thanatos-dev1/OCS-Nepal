@@ -11,7 +11,7 @@ import type { Product } from "@/lib/api/types";
 import { useAdminAuthStore } from "@/stores/adminAuthStore";
 
 function formatNPR(amount: number) {
-  return `NPR ${amount.toLocaleString("en-NP")}`;
+  return `NPR ${amount.toLocaleString("en-IN")}`;
 }
 
 function StockEditor({ product }: { product: Product }) {

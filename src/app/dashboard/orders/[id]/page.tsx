@@ -35,11 +35,11 @@ const STATUS_LABELS: Record<string, string> = {
 const STEPS = ["pending", "confirmed", "out_for_delivery", "delivered"] as const;
 
 function formatNPR(n: number) {
-  return `NPR ${n.toLocaleString("en-NP")}`;
+  return `NPR ${n.toLocaleString("en-IN")}`;
 }
 
 function formatDate(iso: string) {
-  return new Date(iso).toLocaleDateString("en-NP", {
+  return new Date(iso).toLocaleDateString("en-IN", {
     year: "numeric", month: "long", day: "numeric",
     hour: "2-digit", minute: "2-digit",
   });

@@ -12,7 +12,7 @@ import {
 import { queryKeys } from "@/lib/queries";
 
 function formatNPR(amount: number) {
-  return `NPR ${amount.toLocaleString("en-NP")}`;
+  return `NPR ${amount.toLocaleString("en-IN")}`;
 }
 
 const STATUS_COLORS: Record<string, string> = {

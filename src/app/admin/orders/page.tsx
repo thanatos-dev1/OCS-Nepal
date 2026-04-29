@@ -16,11 +16,11 @@ import Button from "@/components/ui/Button";
 import type { Order } from "@/lib/api/types";
 
 function formatNPR(amount: number) {
-  return `NPR ${amount.toLocaleString("en-NP")}`;
+  return `NPR ${amount.toLocaleString("en-IN")}`;
 }
 
 function formatDate(iso: string) {
-  return new Date(iso).toLocaleString("en-NP", { dateStyle: "medium", timeStyle: "short" });
+  return new Date(iso).toLocaleString("en-IN", { dateStyle: "medium", timeStyle: "short" });
 }
 
 const STATUS_TABS = [
@@ -140,7 +140,7 @@ function OrderDetailDrawer({ order, onClose }: { order: Order; onClose: () => vo
               <div className="space-y-2">
                 {order.statusLogs.map((log, i) => (
                   <div key={i} className="text-xs flex gap-2">
-                    <span className="text-text-muted">{new Date(log.createdAt).toLocaleString("en-NP")}</span>
+                    <span className="text-text-muted">{new Date(log.createdAt).toLocaleString("en-IN")}</span>
                     <span className="text-text">{log.fromStatus} → {log.toStatus}</span>
                     {log.note && <span className="text-text-muted">({log.note})</span>}
                   </div>

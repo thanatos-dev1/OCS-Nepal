@@ -20,11 +20,11 @@ import { useOrdersQuery, useRequestReturnMutation } from "@/hooks/useOrders";
 import type { Order, OrderItem } from "@/lib/api/types";
 
 function formatNPR(amount: number) {
-  return `NPR ${amount.toLocaleString("en-NP")}`;
+  return `NPR ${amount.toLocaleString("en-IN")}`;
 }
 
 function formatDate(iso: string) {
-  return new Date(iso).toLocaleDateString("en-NP", {
+  return new Date(iso).toLocaleDateString("en-IN", {
     year: "numeric",
     month: "short",
     day: "numeric",

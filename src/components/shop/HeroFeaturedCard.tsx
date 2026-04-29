@@ -66,7 +66,7 @@ export default function HeroFeaturedCard() {
           {product.name}
         </h3>
         <p className="mt-1 text-2xl font-bold text-white">
-          NPR {product.price.toLocaleString("en-NP")}
+          NPR {product.price.toLocaleString("en-IN")}
         </p>
         <Link
           href={`/products/${product.slug}`}

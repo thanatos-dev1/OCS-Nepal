@@ -10,7 +10,7 @@ import Input from "@/components/ui/Input";
 import type { Coupon, CouponInput } from "@/lib/api/types";
 
 function formatNPR(amount: number) {
-  return `NPR ${amount.toLocaleString("en-NP")}`;
+  return `NPR ${amount.toLocaleString("en-IN")}`;
 }
 
 const EMPTY: CouponInput = {
@@ -193,7 +193,7 @@ export default function AdminCouponsPage() {
                   {c.usedCount}{c.maxUses ? `/${c.maxUses}` : ""}
                 </td>
                 <td className="px-4 py-3 text-text-muted hidden lg:table-cell">
-                  {c.expiresAt ? new Date(c.expiresAt).toLocaleDateString("en-NP") : "—"}
+                  {c.expiresAt ? new Date(c.expiresAt).toLocaleDateString("en-IN") : "—"}
                 </td>
                 <td className="px-4 py-3 text-center">
                   {c.isActive ? (

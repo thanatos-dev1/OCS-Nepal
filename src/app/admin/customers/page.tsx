@@ -9,7 +9,7 @@ import { queryKeys } from "@/lib/queries";
 import Button from "@/components/ui/Button";
 
 function formatNPR(amount: number) {
-  return `NPR ${amount.toLocaleString("en-NP")}`;
+  return `NPR ${amount.toLocaleString("en-IN")}`;
 }
 
 export default function AdminCustomersPage() {

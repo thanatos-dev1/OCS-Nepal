@@ -11,7 +11,7 @@ import { useWishlistQuery, useRemoveFromWishlistMutation } from "@/hooks/useWish
 import { useAddToCartMutation, useCartQuery } from "@/hooks/useCart";
 
 function formatNPR(amount: number) {
-  return `NPR ${amount.toLocaleString("en-NP")}`;
+  return `NPR ${amount.toLocaleString("en-IN")}`;
 }
 
 export default function WishlistPage() {

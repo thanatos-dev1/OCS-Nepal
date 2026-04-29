@@ -21,7 +21,7 @@ import { cn } from "@/lib/utils";
 import { useRouter } from "next/navigation";
 
 function formatNPR(amount: number) {
-  return `NPR ${amount.toLocaleString("en-NP")}`;
+  return `NPR ${amount.toLocaleString("en-IN")}`;
 }
 
 function StarRating({ rating, size = 16 }: { rating: number; size?: number }) {
@@ -349,7 +349,7 @@ export default function ProductPage() {
                 <div className="text-right shrink-0">
                   <p className="text-xs font-medium text-text">{review.user.name}</p>
                   <p className="text-xs text-text-muted">
-                    {new Date(review.createdAt).toLocaleDateString("en-NP")}
+                    {new Date(review.createdAt).toLocaleDateString("en-IN")}
                   </p>
                 </div>
               </div>

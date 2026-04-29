@@ -17,7 +17,7 @@ import { validateCoupon } from "@/lib/api/coupons";
 import type { Address } from "@/lib/api/types";
 
 function formatNPR(amount: number) {
-  return `NPR ${amount.toLocaleString("en-NP")}`;
+  return `NPR ${amount.toLocaleString("en-IN")}`;
 }
 
 type CheckoutMode = "auth" | "guest";

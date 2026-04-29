@@ -13,11 +13,11 @@ import {
 import type { Order } from "@/lib/api/types";
 
 function formatNPR(amount: number) {
-  return `NPR ${amount.toLocaleString("en-NP")}`;
+  return `NPR ${amount.toLocaleString("en-IN")}`;
 }
 
 function formatDate(iso: string) {
-  return new Date(iso).toLocaleDateString("en-NP", { year: "numeric", month: "short", day: "numeric" });
+  return new Date(iso).toLocaleDateString("en-IN", { year: "numeric", month: "short", day: "numeric" });
 }
 
 const STATUS_STYLES: Record<string, string> = {

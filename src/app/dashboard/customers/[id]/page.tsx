@@ -23,11 +23,11 @@ const STATUS_LABELS: Record<string, string> = {
 };
 
 function formatNPR(n: number) {
-  return `NPR ${n.toLocaleString("en-NP")}`;
+  return `NPR ${n.toLocaleString("en-IN")}`;
 }
 
 function formatDate(iso: string) {
-  return new Date(iso).toLocaleDateString("en-NP", { year: "numeric", month: "short", day: "numeric" });
+  return new Date(iso).toLocaleDateString("en-IN", { year: "numeric", month: "short", day: "numeric" });
 }
 
 export default function CustomerDetailPage({ params }: { params: Promise<{ id: string }> }) {

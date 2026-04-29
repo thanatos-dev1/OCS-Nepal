@@ -18,7 +18,7 @@ import {
 } from "@/hooks/useWishlist";
 
 function formatNPR(amount: number) {
-  return `NPR ${amount.toLocaleString("en-NP")}`;
+  return `NPR ${amount.toLocaleString("en-IN")}`;
 }
 
 interface ProductCardProps {
