@@ -3,6 +3,7 @@ import BrandsMarquee from "./BrandsMarquee";
 
 export default async function BrandsStrip() {
   const brands = await getBrands().catch(() => []);
+  if (brands.length === 0) return null;
 
   return (
     <section className="bg-bg-subtle border-y border-border py-6">

@@ -35,8 +35,18 @@ export default function ProductsClient({ initialProducts }: { initialProducts: P
     () => [...new Set(products.map((p) => p.category).filter(Boolean))].sort(),
     [initialProducts]
   );
+  // Build a {brandId, name} list from the currently-fetched products. Using
+  // brandId (not the legacy name string) as the filter value matches what
+  // /brands and the marquee links emit, so links like /products?brand=2 work
+  // end-to-end without translation.
   const brands = useMemo(
-    () => [...new Set(products.map((p) => p.brand).filter((b): b is string => !!b))].sort(),
+    () => {
+      const map = new Map<string, string>();
+      for (const p of products) {
+        if (p.brandId && p.brand) map.set(p.brandId, p.brand);
+      }
+      return Array.from(map.entries()).sort((a, b) => a[1].localeCompare(b[1]));
+    },
     [initialProducts]
   );
 
@@ -67,7 +77,7 @@ export default function ProductsClient({ initialProducts }: { initialProducts: P
     let result = products;
     if (query) result = result.filter((p) => p.name.toLowerCase().includes(query.toLowerCase()));
     if (selectedCategories.length > 0) result = result.filter((p) => selectedCategories.includes(p.category));
-    if (selectedBrandIds.length > 0) result = result.filter((p) => p.brand && selectedBrandIds.includes(p.brand.toLowerCase()));
+    if (selectedBrandIds.length > 0) result = result.filter((p) => p.brandId && selectedBrandIds.includes(p.brandId));
     if (minPrice) result = result.filter((p) => p.price >= Number(minPrice));
     if (maxPrice) result = result.filter((p) => p.price <= Number(maxPrice));
     if (sort === "price_asc") result = [...result].sort((a, b) => a.price - b.price);
@@ -108,15 +118,15 @@ export default function ProductsClient({ initialProducts }: { initialProducts: P
         <div className="pt-6 border-t border-border">
           <h3 className="text-sm font-semibold text-text mb-3">Brand</h3>
           <div className="space-y-2">
-            {brands.map((brand) => (
-              <label key={brand} className="flex items-center gap-2.5 cursor-pointer group">
+            {brands.map(([id, name]) => (
+              <label key={id} className="flex items-center gap-2.5 cursor-pointer group">
                 <input
                   type="checkbox"
-                  checked={selectedBrandIds.includes(brand.toLowerCase())}
-                  onChange={() => toggleBrand(brand.toLowerCase())}
+                  checked={selectedBrandIds.includes(id)}
+                  onChange={() => toggleBrand(id)}
                   className="w-4 h-4 rounded border-border accent-primary cursor-pointer"
                 />
-                <span className="text-sm text-text-muted group-hover:text-text transition-colors">{brand}</span>
+                <span className="text-sm text-text-muted group-hover:text-text transition-colors">{name}</span>
               </label>
             ))}
           </div>

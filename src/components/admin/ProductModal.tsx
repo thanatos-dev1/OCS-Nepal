@@ -1,16 +1,20 @@
 'use client';
 
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { ImagePlus, X } from "lucide-react";
 import Button from "@/components/ui/Button";
 import Input from "@/components/ui/Input";
-import type { Product } from "@/lib/api/types";
-import type { Category } from "@/lib/api/types";
+import SpecValuesEditor from "@/components/admin/SpecValuesEditor";
+import SpecExtrasEditor, { type ExtraRow } from "@/components/admin/SpecExtrasEditor";
+import { useCategorySpecDefinitionsQuery } from "@/hooks/useSpecDefinitions";
+import { useBrandsQuery } from "@/hooks/useBrands";
+import type { SpecInput, SpecExtraInput } from "@/lib/api/products";
+import type { Category, Product } from "@/lib/api/types";
 
 interface Props {
   initial?: Product | null;
   categories: Category[];
-  onSave: (form: FormData) => Promise<void>;
+  onSave: (form: FormData, specs: SpecInput[], extras: SpecExtraInput[]) => Promise<void>;
   onClose: () => void;
 }
 
@@ -21,7 +25,7 @@ export default function ProductModal({ initial, categories, onSave, onClose }: P
   const [price, setPrice] = useState(initial ? String(initial.price) : "");
   const [stock, setStock] = useState(initial ? String(initial.stockCount) : "");
   const [description, setDescription] = useState(initial?.description ?? "");
-  const [brand, setBrand] = useState(initial?.brand ?? "");
+  const [brandId, setBrandId] = useState(initial?.brandId ?? "");
   const [categoryId, setCategoryId] = useState(initial?.categoryId ?? "");
   const [isFeatured, setIsFeatured] = useState(initial?.isFeatured ?? false);
   const [isNewArrival, setIsNewArrival] = useState(initial?.isNewArrival ?? false);
@@ -29,9 +33,48 @@ export default function ProductModal({ initial, categories, onSave, onClose }: P
   const [imageFile, setImageFile] = useState<File | null>(null);
   const [imagePreview, setImagePreview] = useState<string>(initial?.images[0]?.url ?? "");
   const [errors, setErrors] = useState<FieldErrors>({});
+  const [specValues, setSpecValues] = useState<Record<string, string>>(() => {
+    const out: Record<string, string> = {};
+    initial?.specs.forEach((s) => {
+      if (s.value !== null && s.value !== undefined) {
+        out[String(s.specDefinitionId)] = String(s.value);
+      }
+    });
+    return out;
+  });
+  const [specErrors, setSpecErrors] = useState<Record<string, string>>({});
+  const [extras, setExtras] = useState<ExtraRow[]>(
+    () => initial?.specExtras.map((e) => ({ label: e.label, value: e.value })) ?? [],
+  );
   const [apiError, setApiError] = useState("");
   const [loading, setLoading] = useState(false);
   const fileRef = useRef<HTMLInputElement>(null);
+
+  // Look up the selected category's slug; spec definitions are addressed by
+  // slug on the backend.
+  const categorySlug = useMemo(() => {
+    if (!categoryId) return null;
+    return categories.find((c) => c.id === categoryId)?.slug ?? null;
+  }, [categoryId, categories]);
+
+  const { data: specDefinitions = [] } = useCategorySpecDefinitionsQuery(categorySlug);
+  const { data: brands = [] } = useBrandsQuery();
+
+  // When the category changes during editing, drop any spec values whose
+  // definition no longer belongs to the new category — they'd be rejected by
+  // the backend's category-mismatch check anyway.
+  useEffect(() => {
+    if (specDefinitions.length === 0) return;
+    const validIds = new Set(specDefinitions.map((d) => String(d.id)));
+    setSpecValues((prev) => {
+      const filtered: Record<string, string> = {};
+      for (const [k, v] of Object.entries(prev)) {
+        if (validIds.has(k)) filtered[k] = v;
+      }
+      return filtered;
+    });
+    setSpecErrors({});
+  }, [specDefinitions]);
 
   useEffect(() => {
     return () => { if (imagePreview && imageFile) URL.revokeObjectURL(imagePreview); };
@@ -57,7 +100,42 @@ export default function ProductModal({ initial, categories, onSave, onClose }: P
     const s = parseInt(stock, 10);
     if (stock && (isNaN(s) || s < 0)) errs.stock = "Must be 0 or more";
     setErrors(errs);
-    return Object.keys(errs).length === 0;
+
+    const sErrs: Record<string, string> = {};
+    for (const def of specDefinitions) {
+      if (def.required && !specValues[String(def.id)]) {
+        sErrs[String(def.id)] = "Required";
+      }
+    }
+    setSpecErrors(sErrs);
+
+    return Object.keys(errs).length === 0 && Object.keys(sErrs).length === 0;
+  }
+
+  // Build the SpecInput payload from current state. Skips empty values
+  // (= "no value set"). The backend coerces strings to the typed columns.
+  function buildSpecPayload(): SpecInput[] {
+    return specDefinitions
+      .map((def) => {
+        const v = specValues[String(def.id)] ?? "";
+        if (v === "") return null;
+        return { spec_definition_id: def.id, value: v };
+      })
+      .filter((x): x is SpecInput => x !== null);
+  }
+
+  // Skip rows whose label or value is blank — they'd be rejected server-side.
+  // sort_order falls out of the array index so reordering in the UI is the
+  // single source of truth.
+  function buildExtrasPayload(): SpecExtraInput[] {
+    return extras
+      .map((row, i) => {
+        const label = row.label.trim();
+        const value = row.value.trim();
+        if (!label || !value) return null;
+        return { label, value, sort_order: i };
+      })
+      .filter((x): x is SpecExtraInput => x !== null);
   }
 
   async function handleSubmit(e: React.FormEvent) {
@@ -71,7 +149,7 @@ export default function ProductModal({ initial, categories, onSave, onClose }: P
     form.append("price", price);
     if (stock) form.append("stock", stock);
     if (description.trim()) form.append("description", description.trim());
-    if (brand.trim()) form.append("brand", brand.trim());
+    if (brandId) form.append("brand_id", brandId);
     if (categoryId) form.append("category_id", categoryId);
     form.append("is_featured", String(isFeatured));
     form.append("is_new_arrival", String(isNewArrival));
@@ -81,7 +159,7 @@ export default function ProductModal({ initial, categories, onSave, onClose }: P
     else if (initial?.images[0]?.url) form.append("image_url", initial.images[0].url);
 
     try {
-      await onSave(form);
+      await onSave(form, buildSpecPayload(), buildExtrasPayload());
       onClose();
     } catch (err: unknown) {
       const msg = (err as { response?: { data?: { error?: string } } })?.response?.data?.error;
@@ -145,7 +223,20 @@ export default function ProductModal({ initial, categories, onSave, onClose }: P
             </div>
           </div>
 
-          <Input id="p-brand" label="Brand" value={brand} onChange={(e) => setBrand(e.target.value)} placeholder="NVIDIA" />
+          <div className="flex flex-col gap-1.5">
+            <label htmlFor="p-brand" className="text-sm font-medium text-text">Brand</label>
+            <select
+              id="p-brand"
+              value={brandId}
+              onChange={(e) => setBrandId(e.target.value)}
+              className="w-full rounded-md border border-border bg-bg px-3.5 py-2.5 text-sm text-text focus:outline-none focus:ring-2 focus:ring-accent focus:ring-offset-1 hover:border-border-strong transition-colors"
+            >
+              <option value="">— None —</option>
+              {brands.filter((b) => b.isActive).map((b) => (
+                <option key={b.id} value={b.id}>{b.name}</option>
+              ))}
+            </select>
+          </div>
 
           <div className="flex flex-col gap-1.5">
             <label htmlFor="p-category" className="text-sm font-medium text-text">Category</label>
@@ -194,6 +285,23 @@ export default function ProductModal({ initial, categories, onSave, onClose }: P
               className="w-full rounded-md border border-border bg-bg px-3.5 py-2.5 text-sm text-text placeholder:text-text-disabled resize-none focus:outline-none focus:ring-2 focus:ring-accent focus:ring-offset-1 hover:border-border-strong transition-colors"
             />
           </div>
+
+          <SpecValuesEditor
+            definitions={specDefinitions}
+            values={specValues}
+            errors={specErrors}
+            onChange={(defId, value) => {
+              setSpecValues((prev) => ({ ...prev, [String(defId)]: value }));
+              setSpecErrors((prev) => {
+                if (!prev[String(defId)]) return prev;
+                const next = { ...prev };
+                delete next[String(defId)];
+                return next;
+              });
+            }}
+          />
+
+          <SpecExtrasEditor rows={extras} onChange={setExtras} />
 
           {apiError && <p className="text-sm text-error">{apiError}</p>}
         </form>

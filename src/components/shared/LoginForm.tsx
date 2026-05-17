@@ -8,6 +8,7 @@ import Button from "@/components/ui/Button";
 import Input from "@/components/ui/Input";
 import { login, getProfile } from "@/lib/api/auth";
 import { useAuthStore } from "@/stores/authStore";
+import { mergeGuestCartIntoServer } from "@/lib/cart/mergeGuestCart";
 
 interface FormErrors {
   email?: string;
@@ -57,6 +58,10 @@ export default function LoginForm() {
       setToken(access_token);
       const profile = await getProfile();
       setUser(profile);
+      // Owners/staff don't have a shopping cart UI; skip the merge for them.
+      if (profile.role === "customer") {
+        await mergeGuestCartIntoServer();
+      }
       const defaultDest = profile.role === "owner" ? "/dashboard" : "/";
       router.push(nextUrl ?? defaultDest);
     } catch (err) {

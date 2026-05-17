@@ -1,5 +1,6 @@
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { getCategories, createCategory, updateCategory, deleteCategory, type CategoryInput } from "@/lib/api/categories";
+import { getCategoryBrandSeries } from "@/lib/api/categoryBrandSeries";
 import { queryKeys } from "@/lib/queries";
 import type { Category } from "@/lib/api/types";
 
@@ -7,6 +8,15 @@ export function useCategoriesQuery() {
   return useQuery({
     queryKey: queryKeys.categories,
     queryFn: getCategories,
+  });
+}
+
+export function useCategoryBrandSeriesQuery(slug: string | null) {
+  return useQuery({
+    queryKey: queryKeys.categoryBrandSeries(slug ?? ""),
+    queryFn: () => getCategoryBrandSeries(slug as string),
+    enabled: !!slug,
+    staleTime: 1000 * 60 * 10,
   });
 }
 

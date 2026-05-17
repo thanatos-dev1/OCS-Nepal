@@ -298,8 +298,26 @@ export default function ProductPage() {
                 key={`${spec.key}-${i}`}
                 className={`flex items-center px-5 py-3.5 text-sm ${i % 2 === 0 ? "bg-bg-card" : "bg-bg-subtle"}`}
               >
-                <span className="w-40 font-medium text-text-muted shrink-0">{spec.key}</span>
-                <span className="text-text">{spec.value}</span>
+                <span className="w-40 font-medium text-text-muted shrink-0">{spec.label}</span>
+                <span className="text-text">{spec.displayValue}</span>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
+
+      {/* Extras */}
+      {product.specExtras.length > 0 && (
+        <div className="mt-10">
+          <h2 className="text-lg font-bold text-text mb-4">Additional Details</h2>
+          <div className="border border-border rounded-xl overflow-hidden">
+            {product.specExtras.map((extra, i) => (
+              <div
+                key={extra.id}
+                className={`flex items-start px-5 py-3.5 text-sm ${i % 2 === 0 ? "bg-bg-card" : "bg-bg-subtle"}`}
+              >
+                <span className="w-40 font-medium text-text-muted shrink-0">{extra.label}</span>
+                <span className="text-text whitespace-pre-wrap">{extra.value}</span>
               </div>
             ))}
           </div>

@@ -130,7 +130,7 @@ export default function AdminProductsPage() {
         <ProductModal
           initial={modal.product}
           categories={categories}
-          onSave={(form) => saveMutation.mutateAsync(form)}
+          onSave={(form, specs, extras) => saveMutation.mutateAsync({ form, specs, extras })}
           onClose={() => setModal({ open: false, product: null })}
         />
       )}

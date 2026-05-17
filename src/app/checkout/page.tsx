@@ -9,6 +9,7 @@ import Input from "@/components/ui/Input";
 import AddressAutocomplete from "@/components/ui/AddressAutocomplete";
 import ProductImage from "@/components/shop/ProductImage";
 import { useAuthStore } from "@/stores/authStore";
+import { useGuestCartStore } from "@/stores/guestCartStore";
 import { useCartQuery } from "@/hooks/useCart";
 import { usePlaceOrderMutation, usePlaceGuestOrderMutation } from "@/hooks/useOrders";
 import { useUpdateProfileMutation } from "@/hooks/useProfile";
@@ -53,6 +54,7 @@ export default function CheckoutPage() {
   const { data: addresses = [] } = useAddressesQuery();
   const placeOrder = usePlaceOrderMutation();
   const placeGuestOrder = usePlaceGuestOrderMutation();
+  const clearGuestCart = useGuestCartStore((s) => s.clear);
   const updateProfile = useUpdateProfileMutation();
 
   const [checkoutMode, setCheckoutMode] = useState<CheckoutMode>(token ? "auth" : "guest");
@@ -154,13 +156,14 @@ export default function CheckoutPage() {
     try {
       if (checkoutMode === "guest") {
         await placeGuestOrder.mutateAsync({
-          email: guestEmail.trim(),
+          guestEmail: guestEmail.trim(),
           deliveryAddress: guestAddress.trim(),
           phone: guestPhone.trim(),
           items: items.map((i) => ({ product_id: parseInt(i.productId as unknown as string, 10), quantity: i.quantity })),
           couponCode: couponCode || undefined,
           note: note.trim() || undefined,
         });
+        clearGuestCart();
         router.push("/");
         return;
       }

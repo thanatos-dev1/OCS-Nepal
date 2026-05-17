@@ -33,7 +33,7 @@ export default function ProductImage({
 
   if (src) {
     return (
-      <div className={cn("relative w-full h-full", className)}>
+      <div className={cn("relative w-full h-full z-0", className)}>
         <Image
           src={src}
           alt={alt}

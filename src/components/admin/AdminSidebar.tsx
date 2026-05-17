@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
-import { LayoutGrid, Tag, LogOut, Package, Percent, Ticket, Users, Boxes } from "lucide-react";
+import { LayoutGrid, Tag, LogOut, Package, Percent, Ticket, Users, Boxes, BadgeCheck } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useAuthStore } from "@/stores/authStore";
 import { logout } from "@/lib/api/auth";
@@ -10,6 +10,7 @@ import { logout } from "@/lib/api/auth";
 const nav = [
   { label: "Products", href: "/dashboard/products", icon: LayoutGrid },
   { label: "Categories", href: "/dashboard/categories", icon: Tag },
+  { label: "Brands", href: "/dashboard/brands", icon: BadgeCheck },
   { label: "Inventory", href: "/dashboard/inventory", icon: Boxes },
   { label: "Offers", href: "/dashboard/offers", icon: Percent },
   { label: "Coupons", href: "/dashboard/coupons", icon: Ticket },

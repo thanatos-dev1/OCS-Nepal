@@ -1,6 +1,12 @@
 export type Brand = {
   id: string;
   name: string;
+  slug: string;
+  logoUrl?: string;
+  website?: string;
+  sortOrder: number;
+  isActive: boolean;
+  productCount: number;
 };
 
 export type Category = {
@@ -15,6 +21,19 @@ export type Category = {
   showInBar: boolean;
 };
 
+export type BrandSeries = {
+  id: string;
+  name: string;
+  slug: string;
+};
+
+export type CategoryBrandGroup = {
+  brandId: string;
+  brandName: string;
+  brandSlug: string;
+  series: BrandSeries[];
+};
+
 export type ProductImage = {
   id: number;
   url: string;
@@ -23,10 +42,28 @@ export type ProductImage = {
   sortOrder: number;
 };
 
+export type SpecDataType = "int" | "decimal" | "string" | "bool" | "enum";
+
+// ProductSpec is a single typed spec on a product, projected from the
+// backend's (ProductSpec, SpecDefinition) join. `value` is the native typed
+// value; `displayValue` is the pre-formatted string ("16 GB", "Yes") suitable
+// for rendering as-is.
 export type ProductSpec = {
+  specDefinitionId: number;
   key: string;
+  label: string;
+  unit?: string;
+  dataType: SpecDataType;
+  value: number | string | boolean | null;
+  displayValue: string;
+};
+
+// Freeform key/value extras shown alongside typed specs on the product page
+// ("What's in the box", "Warranty notes", etc.). Not filterable.
+export type ProductSpecExtra = {
+  id: number;
+  label: string;
   value: string;
-  sortOrder: number;
 };
 
 export type Product = {
@@ -41,14 +78,32 @@ export type Product = {
   stockCount: number;
   lowStockThreshold: number;
   brand?: string;
+  brandId?: string;
   badge?: string;
   description: string;
   specs: ProductSpec[];
+  specExtras: ProductSpecExtra[];
   images: ProductImage[];
   isFeatured: boolean;
   isNewArrival: boolean;
   isActive: boolean;
   salePrice?: number;
+};
+
+// SpecDefinition is the per-category template that drives filter UI and spec
+// admin forms. Returned from GET /categories/:slug/spec-definitions.
+export type SpecDefinition = {
+  id: number;
+  categoryId: number;
+  key: string;
+  label: string;
+  unit?: string;
+  dataType: SpecDataType;
+  enumOptions?: string[];
+  filterable: boolean;
+  comparable: boolean;
+  required: boolean;
+  sortOrder: number;
 };
 
 export type Offer = {

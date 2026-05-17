@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { useRecentlyViewed } from "@/hooks/useRecentlyViewed";
-import ProductCard from "@/components/shop/ProductCard";
+import ProductCarousel from "@/components/shop/ProductCarousel";
 
 export default function RecentlyViewed() {
   const products = useRecentlyViewed();
@@ -20,11 +20,7 @@ export default function RecentlyViewed() {
             Browse all
           </Link>
         </div>
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
-          {products.map((product) => (
-            <ProductCard key={product.id} product={product} />
-          ))}
-        </div>
+        <ProductCarousel products={products} />
       </div>
     </section>
   );

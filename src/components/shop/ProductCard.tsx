@@ -22,7 +22,10 @@ interface ProductCardProps {
   showCategory?: boolean;
 }
 
-export default function ProductCard({ product, showCategory = true }: ProductCardProps) {
+export default function ProductCard({
+  product,
+  showCategory = true,
+}: ProductCardProps) {
   const router = useRouter();
   const token = useAuthStore((s) => s.token);
   const user = useAuthStore((s) => s.user);
@@ -33,25 +36,40 @@ export default function ProductCard({ product, showCategory = true }: ProductCar
   const { data: wishlist = [] } = useWishlistQuery();
   const addToWishlist = useAddToWishlistMutation();
   const removeFromWishlist = useRemoveFromWishlistMutation();
-  const inWishlist = wishlist.some((w) => w.productId === parseInt(product.id, 10));
+  const inWishlist = wishlist.some(
+    (w) => w.productId === parseInt(product.id, 10),
+  );
 
   const isShopUser = !user || user.role === "customer";
   const cartQty =
-    cartItems.find((i) => i.productId === parseInt(product.id, 10))?.quantity ?? 0;
+    cartItems.find((i) => i.productId === parseInt(product.id, 10))?.quantity ??
+    0;
   const atStockLimit = cartQty >= product.stockCount;
 
   const primaryImage = product.images?.[0]?.url;
+
+  // Pick the first 3 non-string typed specs for a compact chip preview.
+  // Strings (e.g. full CPU model names) are too long to fit cleanly.
+  const previewSpecs = (product.specs ?? [])
+    .filter((s) => s.dataType !== "string" && s.displayValue !== "")
+    .slice(0, 3);
 
   function handleAddToCart(e: React.MouseEvent) {
     e.preventDefault();
     e.stopPropagation();
     if (!product.inStock || atStockLimit) return;
-    if (!token) {
-      router.push("/account/login");
-      return;
-    }
     addToCart.mutate(
-      { productId: parseInt(product.id, 10), quantity: 1 },
+      {
+        productId: parseInt(product.id, 10),
+        quantity: 1,
+        product: {
+          id: parseInt(product.id, 10),
+          name: product.name,
+          price: product.salePrice ?? product.price,
+          imageUrl: primaryImage,
+          stock: product.stockCount,
+        },
+      },
       {
         onSuccess: () => {
           setAdded(true);
@@ -82,26 +100,36 @@ export default function ProductCard({ product, showCategory = true }: ProductCar
       className="group bg-bg-card border border-border rounded-xl overflow-hidden hover:shadow-card hover:border-border-strong transition-all"
     >
       <div className="relative h-44 overflow-hidden pt-2">
-        <ProductImage src={primaryImage} alt={product.name} category={product.category} />
+        <ProductImage
+          src={primaryImage}
+          alt={product.name}
+          category={product.category}
+        />
 
         {/* Badges — left side */}
-        <div className="absolute top-3 left-3 flex flex-col gap-1">
+        <div className="absolute top-3 left-3 z-20 flex flex-col gap-1">
           {product.salePrice ? (
             <Badge label="Sale" />
           ) : product.badge ? (
             <Badge label={product.badge} />
           ) : null}
           {product.isFeatured && !product.salePrice && (
-            <Badge label="Featured" className="bg-primary/10 text-primary border-primary/20" />
+            <Badge
+              label="Featured"
+              className="bg-primary/10 text-primary border-primary/20"
+            />
           )}
           {product.isNewArrival && (
-            <Badge label="New" className="bg-success/10 text-success border-success/20" />
+            <Badge
+              label="New"
+              className="bg-success/10 text-success border-success/20"
+            />
           )}
         </div>
 
         {/* Out of stock */}
         {!product.inStock && (
-          <span className="absolute top-3 right-10 px-2 py-0.5 text-xs font-semibold bg-bg text-text-disabled border border-border rounded-sm">
+          <span className="absolute top-3 right-10 z-20 px-2 py-0.5 text-xs font-semibold bg-bg text-text-disabled border border-border rounded-sm">
             Out of Stock
           </span>
         )}
@@ -112,7 +140,7 @@ export default function ProductCard({ product, showCategory = true }: ProductCar
             type="button"
             onClick={handleWishlistToggle}
             className={cn(
-              "absolute top-2 right-2 p-1.5 rounded-full bg-bg/80 backdrop-blur-sm border border-border transition-colors",
+              "absolute top-2 right-2 z-20 p-1.5 rounded-full bg-bg/80 backdrop-blur-sm border border-border transition-colors",
               inWishlist
                 ? "text-error border-error/30 hover:bg-error-light"
                 : "text-text-disabled hover:text-error hover:border-error/30",
@@ -124,35 +152,73 @@ export default function ProductCard({ product, showCategory = true }: ProductCar
         )}
       </div>
 
-      <div className="p-4">
-        {showCategory && (
-          <p className="text-xs text-text-disabled uppercase tracking-wide mb-1">
-            {product.category}
-          </p>
+      <div className="p-4 flex flex-col gap-2">
+        {/* Brand + (optional) category */}
+        {(product.brand || (showCategory && product.category)) && (
+          <div className="flex items-center gap-1.5 text-xs">
+            {product.brand && (
+              <span className="font-semibold uppercase tracking-wide text-primary">
+                {product.brand}
+              </span>
+            )}
+            {product.brand && showCategory && product.category && (
+              <span className="text-text-disabled">·</span>
+            )}
+            {showCategory && product.category && (
+              <span className="text-text-disabled uppercase tracking-wide">
+                {product.category}
+              </span>
+            )}
+          </div>
         )}
-        <h3
-          className={cn(
-            "text-sm font-semibold leading-snug transition-colors text-text group-hover:text-primary",
-            !showCategory && "mt-0",
-          )}
-        >
+
+        {/* Name */}
+        <h3 className="text-sm font-semibold leading-snug transition-colors text-text group-hover:text-primary line-clamp-2 min-h-[2.5rem]">
           {product.name}
         </h3>
 
+        {/* Spec preview — typed specs only, up to 3 */}
+        {previewSpecs.length > 0 && (
+          <div className="flex flex-wrap gap-1">
+            {previewSpecs.map((spec) => (
+              <span
+                key={spec.specDefinitionId}
+                className="inline-block px-1.5 py-0.5 text-[10px] font-medium bg-bg-subtle text-text-muted rounded border border-border"
+              >
+                {spec.displayValue}
+              </span>
+            ))}
+          </div>
+        )}
+
+        {/* Price */}
         {product.salePrice ? (
-          <div className="mt-3 flex items-baseline gap-2">
-            <span className="text-base font-bold text-error">{formatNPR(product.salePrice)}</span>
-            <span className="text-sm text-text-muted line-through">{formatNPR(product.price)}</span>
+          <div className="flex items-baseline gap-2">
+            <span className="text-base font-bold text-error">
+              {formatNPR(product.salePrice)}
+            </span>
+            <span className="text-sm text-text-muted line-through">
+              {formatNPR(product.price)}
+            </span>
           </div>
         ) : (
-          <p className="mt-3 text-base font-bold text-text">{formatNPR(product.price)}</p>
+          <p className="text-base font-bold text-text">
+            {formatNPR(product.price)}
+          </p>
         )}
+
+        {/* Stock indicator */}
+        <StockIndicator
+          inStock={product.inStock}
+          stockCount={product.stockCount}
+          threshold={product.lowStockThreshold}
+        />
 
         {isShopUser && (
           <Button
             variant="cta"
             size="sm"
-            className="mt-3 w-full"
+            className="mt-1 w-full"
             disabled={!product.inStock || atStockLimit}
             onClick={handleAddToCart}
           >
@@ -168,4 +234,22 @@ export default function ProductCard({ product, showCategory = true }: ProductCar
       </div>
     </Link>
   );
+}
+
+function StockIndicator({
+  inStock,
+  stockCount,
+  threshold,
+}: {
+  inStock: boolean;
+  stockCount: number;
+  threshold: number;
+}) {
+  if (!inStock) {
+    return <span className="text-xs font-medium text-error">Out of stock</span>;
+  }
+  if (stockCount > 0 && stockCount <= Math.max(threshold, 5)) {
+    return <span className="text-xs font-medium text-warning">Only {stockCount} left</span>;
+  }
+  return <span className="text-xs font-medium text-success">In stock</span>;
 }

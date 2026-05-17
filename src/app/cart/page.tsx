@@ -3,7 +3,7 @@
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
-import { Trash2, ShoppingBag, Minus, Plus, LogIn } from "lucide-react";
+import { Trash2, ShoppingBag, Minus, Plus } from "lucide-react";
 import { useCartQuery, useUpdateCartItemMutation, useRemoveCartItemMutation, useClearCartMutation } from "@/hooks/useCart";
 import { useAuthStore } from "@/stores/authStore";
 import Button from "@/components/ui/Button";
@@ -12,7 +12,6 @@ import { formatNPR } from "@/lib/utils";
 
 export default function CartPage() {
   const router = useRouter();
-  const token = useAuthStore((s) => s.token);
   const user = useAuthStore((s) => s.user);
   const isInitialized = useAuthStore((s) => s._isInitialized);
 
@@ -62,24 +61,6 @@ export default function CartPage() {
 
   const subtotal = items.reduce((sum, item) => sum + item.product.price * item.quantity, 0);
   const totalQty = items.reduce((n, i) => n + i.quantity, 0);
-
-  // Unauthenticated state
-  if (isInitialized && !token) {
-    return (
-      <main className="min-h-[60vh] flex flex-col items-center justify-center gap-5 px-4">
-        <LogIn size={48} className="text-border-strong" />
-        <div className="text-center">
-          <p className="text-lg font-semibold text-text">Sign in to view your cart</p>
-          <p className="mt-1 text-sm text-text-muted">
-            Your cart is saved to your account.
-          </p>
-        </div>
-        <Link href="/account/login">
-          <Button variant="primary">Sign In</Button>
-        </Link>
-      </main>
-    );
-  }
 
   if (!isInitialized || isLoading) {
     return (

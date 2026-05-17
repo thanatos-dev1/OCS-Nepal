@@ -1,7 +1,6 @@
 "use client";
 
 import { useState } from "react";
-import { useRouter } from "next/navigation";
 import { ShoppingCart, Check } from "lucide-react";
 import Button from "@/components/ui/Button";
 import { useAddToCartMutation, useCartQuery } from "@/hooks/useCart";
@@ -12,6 +11,7 @@ interface AddToCartButtonProps {
     id: string;
     name: string;
     price: number;
+    salePrice?: number;
     inStock: boolean;
     stockCount?: number;
     images?: { url: string }[];
@@ -20,8 +20,6 @@ interface AddToCartButtonProps {
 }
 
 export default function AddToCartButton({ product }: AddToCartButtonProps) {
-  const router = useRouter();
-  const token = useAuthStore((s) => s.token);
   const user = useAuthStore((s) => s.user);
   const addToCart = useAddToCartMutation();
   const { data: cartItems = [] } = useCartQuery();
@@ -35,9 +33,18 @@ export default function AddToCartButton({ product }: AddToCartButtonProps) {
 
   function handleClick() {
     if (isDisabled) return;
-    if (!token) { router.push("/account/login"); return; }
     addToCart.mutate(
-      { productId: parseInt(product.id, 10), quantity: 1 },
+      {
+        productId: parseInt(product.id, 10),
+        quantity: 1,
+        product: {
+          id: parseInt(product.id, 10),
+          name: product.name,
+          price: product.salePrice ?? product.price,
+          imageUrl: product.images?.[0]?.url,
+          stock: product.stockCount,
+        },
+      },
       {
         onSuccess: () => {
           setAdded(true);

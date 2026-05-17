@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { ArrowRight, Tag } from "lucide-react";
-import ProductCard from "@/components/shop/ProductCard";
+import ProductCarousel from "@/components/shop/ProductCarousel";
 import { getOffers } from "@/lib/api/offers";
 
 export default async function DealsSection() {
@@ -33,11 +33,7 @@ export default async function DealsSection() {
             View all <ArrowRight size={14} />
           </Link>
         </div>
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
-          {products.slice(0, 8).map((product) => (
-            <ProductCard key={product.id} product={product} />
-          ))}
-        </div>
+        <ProductCarousel products={products.slice(0, 8)} />
       </div>
     </section>
   );

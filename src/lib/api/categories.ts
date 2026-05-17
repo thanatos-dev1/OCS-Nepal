@@ -34,14 +34,11 @@ export async function getCategories(): Promise<Category[]> {
 }
 
 export async function getCategoryBySlug(slug: string): Promise<Category | null> {
-  try {
-    const { data } = await api.get<ApiCategory>(`/categories/${slug}`);
-    return adaptCategory(data);
-  } catch {
-    // fallback: fetch all and find by slug
-    const all = await getCategories();
-    return all.find((c) => c.slug === slug) ?? null;
-  }
+  // Backend has no get-by-slug endpoint; client-side find on the list keeps
+  // navigation pages working without an extra route. Acceptable given the
+  // category list is small and already cached by getCategories' query key.
+  const list = await getCategories();
+  return list.find((c) => c.slug === slug) ?? null;
 }
 
 export type CategoryInput = {

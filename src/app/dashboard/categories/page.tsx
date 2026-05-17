@@ -1,7 +1,8 @@
 'use client';
 
 import { useState } from "react";
-import { Plus, Pencil, Trash2 } from "lucide-react";
+import Link from "next/link";
+import { Plus, Pencil, Trash2, ListChecks } from "lucide-react";
 import Button from "@/components/ui/Button";
 import CategoryModal from "@/components/admin/CategoryModal";
 import ConfirmDialog from "@/components/admin/ConfirmDialog";
@@ -79,6 +80,13 @@ export default function AdminCategoriesPage() {
                   </td>
                   <td className="px-4 py-3">
                     <div className="flex items-center justify-end gap-2">
+                      <Link
+                        href={`/dashboard/categories/${c.slug}`}
+                        title="Manage spec definitions"
+                        className="p-1.5 rounded-md text-text-muted hover:text-primary hover:bg-primary-light transition-colors"
+                      >
+                        <ListChecks size={14} />
+                      </Link>
                       <button
                         onClick={() => setModal({ open: true, category: c })}
                         className="p-1.5 rounded-md text-text-muted hover:text-primary hover:bg-primary-light transition-colors"
