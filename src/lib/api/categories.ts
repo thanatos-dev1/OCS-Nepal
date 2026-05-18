@@ -10,7 +10,9 @@ type ApiCategory = {
   ParentID?: number | null;
   ProductCount?: number;
   ShowInBar?: boolean;
+  ShowOnHomepage?: boolean;
   Icon?: string;
+  CoverImageURL?: string;
   Children?: ApiCategory[];
 };
 
@@ -25,6 +27,8 @@ function adaptCategory(c: ApiCategory): Category {
     parentId: c.ParentID != null ? String(c.ParentID) : null,
     productCount: c.ProductCount ?? 0,
     showInBar: c.ShowInBar ?? false,
+    showOnHomepage: c.ShowOnHomepage ?? false,
+    coverImageUrl: c.CoverImageURL ?? "",
   };
 }
 
@@ -42,11 +46,12 @@ export async function getCategoryBySlug(slug: string): Promise<Category | null> 
 }
 
 export type CategoryInput = {
-  Name: string;
-  ShowInBar: boolean;
-  Description?: string;
-  SortOrder?: number;
-  ParentID?: number | null;
+  name: string;
+  show_in_bar: boolean;
+  show_on_homepage: boolean;
+  description?: string;
+  sort_order?: number;
+  parent_id?: number | null;
 };
 
 // --- Owner endpoints ---
@@ -63,4 +68,13 @@ export async function updateCategory(id: number, input: CategoryInput): Promise<
 
 export async function deleteCategory(id: number): Promise<void> {
   await api.delete(`/categories/${id}`);
+}
+
+export async function uploadCategoryCover(id: number, file: File): Promise<Category> {
+  const form = new FormData();
+  form.append("image", file);
+  const { data } = await api.post<ApiCategory>(`/categories/${id}/cover-image`, form, {
+    headers: { "Content-Type": "multipart/form-data" },
+  });
+  return adaptCategory(data);
 }

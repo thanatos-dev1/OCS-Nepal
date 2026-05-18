@@ -4,6 +4,8 @@ import { useState } from "react";
 import { X } from "lucide-react";
 import Button from "@/components/ui/Button";
 import Input from "@/components/ui/Input";
+import BrandSeriesManager from "@/components/admin/BrandSeriesManager";
+import BrandCategoryLinks from "@/components/admin/BrandCategoryLinks";
 import type { Brand } from "@/lib/api/types";
 import type { BrandInput } from "@/lib/api/brands";
 
@@ -43,10 +45,12 @@ export default function BrandModal({ initial, onSave, onClose }: Props) {
     }
   }
 
+  const brandId = initial ? parseInt(initial.id, 10) : null;
+
   return (
     <div className="fixed inset-0 z-overlay flex items-center justify-center bg-black/40 p-4">
-      <div className="bg-bg rounded-xl shadow-lg w-full max-w-sm">
-        <div className="flex items-center justify-between px-6 py-4 border-b border-border">
+      <div className={`bg-bg rounded-xl shadow-lg w-full max-h-[90vh] flex flex-col ${initial ? "max-w-2xl" : "max-w-sm"}`}>
+        <div className="flex items-center justify-between px-6 py-4 border-b border-border shrink-0">
           <h2 className="text-base font-semibold text-text">
             {initial ? "Edit Brand" : "New Brand"}
           </h2>
@@ -54,7 +58,7 @@ export default function BrandModal({ initial, onSave, onClose }: Props) {
             <X size={18} />
           </button>
         </div>
-        <form onSubmit={handleSubmit} className="px-6 py-5 flex flex-col gap-4">
+        <form onSubmit={handleSubmit} className="overflow-y-auto px-6 py-5 flex flex-col gap-4">
           <Input
             id="brand-name"
             label="Name"
@@ -99,6 +103,19 @@ export default function BrandModal({ initial, onSave, onClose }: Props) {
             />
             <span className="text-sm font-medium text-text">Active</span>
           </label>
+
+          {brandId && (
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-5 pt-4 border-t border-border">
+              <BrandCategoryLinks brandId={brandId} />
+              <BrandSeriesManager brandId={brandId} />
+            </div>
+          )}
+
+          {!brandId && (
+            <p className="text-xs text-text-muted pt-2 border-t border-border">
+              Save the brand first to manage its series and category links.
+            </p>
+          )}
 
           <div className="flex justify-end gap-3 pt-1">
             <Button type="button" variant="outline" size="sm" onClick={onClose} disabled={loading}>

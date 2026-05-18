@@ -13,13 +13,19 @@ const HOVER_CLOSE_DELAY = 150;
 
 function CategoryMegaMenu({
   category,
+  subCategories,
   active,
 }: {
   category: Category;
+  subCategories: Category[];
   active: boolean;
 }) {
   const [open, setOpen] = useState(false);
   const [panelTop, setPanelTop] = useState(0);
+  // Viewport X-coordinate of the trigger chip's horizontal center, used to
+  // place the speech-bubble triangle directly under the chip that opened the
+  // panel.
+  const [triggerCenterX, setTriggerCenterX] = useState(0);
   const triggerRef = useRef<HTMLDivElement>(null);
   const openTimer = useRef<number | null>(null);
   const closeTimer = useRef<number | null>(null);
@@ -32,6 +38,7 @@ function CategoryMegaMenu({
       if (!el) return;
       const rect = el.getBoundingClientRect();
       setPanelTop(rect.bottom + 8);
+      setTriggerCenterX(rect.left + rect.width / 2);
     }
     measure();
     window.addEventListener("resize", measure);
@@ -109,6 +116,18 @@ function CategoryMegaMenu({
             onMouseEnter={scheduleOpen}
             onMouseLeave={scheduleClose}
           >
+            {/* Speech-bubble triangle pointing up at the chip that opened
+                this panel. Two stacked CSS triangles: the back one provides
+                the border edge, the front one fills with white and overlaps
+                the panel's top border by 1px so the seam disappears. */}
+            <div
+              aria-hidden="true"
+              className="absolute pointer-events-none"
+              style={{ left: triggerCenterX - 8, top: -8 }}
+            >
+              <div className="absolute w-0 h-0 border-l-8 border-r-8 border-b-8 border-l-transparent border-r-transparent border-b-border" />
+              <div className="absolute w-0 h-0 border-l-8 border-r-8 border-b-8 border-l-transparent border-r-transparent border-b-white" style={{ top: 1 }} />
+            </div>
             <div className="max-w-7xl mx-auto bg-white border border-border rounded-xl shadow-xl p-6">
                 {isLoading || !groups ? (
                   <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-6">
@@ -121,10 +140,30 @@ function CategoryMegaMenu({
                       </div>
                     ))}
                   </div>
-                ) : groups.length === 0 ? (
-                  <p className="text-sm text-text-muted">No brands available yet.</p>
+                ) : groups.length === 0 && subCategories.length === 0 ? (
+                  <p className="text-sm text-text-muted">Nothing here yet.</p>
                 ) : (
                   <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-x-6 gap-y-4">
+                    {subCategories.length > 0 && (
+                      <div className="min-w-0">
+                        <p className="text-sm font-semibold text-primary uppercase tracking-wide mb-2">
+                          Categories
+                        </p>
+                        <ul className="space-y-1.5">
+                          {subCategories.map((sub) => (
+                            <li key={sub.id}>
+                              <Link
+                                href={`/categories/${sub.slug}`}
+                                onClick={() => setOpen(false)}
+                                className="block text-sm text-text-muted hover:text-accent transition-colors truncate"
+                              >
+                                {sub.name}
+                              </Link>
+                            </li>
+                          ))}
+                        </ul>
+                      </div>
+                    )}
                     {groups.map((group) => (
                       <div key={group.brandId} className="min-w-0">
                         <Link
@@ -172,7 +211,18 @@ export default function CategoryBar() {
   const pathname = usePathname();
   const { data: categories, isLoading } = useCategoriesQuery();
 
-  const parents = (categories ?? []).filter((c) => c.showInBar && !c.parentId);
+  const all = categories ?? [];
+  const parents = all.filter((c) => c.showInBar && !c.parentId);
+
+  // Group sub-categories by their parent ID so each mega-menu can show its own.
+  const childrenByParent = new Map<string, Category[]>();
+  for (const c of all) {
+    if (c.parentId) {
+      const list = childrenByParent.get(c.parentId);
+      if (list) list.push(c);
+      else childrenByParent.set(c.parentId, [c]);
+    }
+  }
 
   if (!isLoading && parents.length === 0) return null;
 
@@ -187,7 +237,14 @@ export default function CategoryBar() {
             : parents.map((cat) => {
                 const href = `/categories/${cat.slug}`;
                 const active = pathname === href || pathname.startsWith(href + "/");
-                return <CategoryMegaMenu key={cat.id} category={cat} active={active} />;
+                return (
+                  <CategoryMegaMenu
+                    key={cat.id}
+                    category={cat}
+                    subCategories={childrenByParent.get(cat.id) ?? []}
+                    active={active}
+                  />
+                );
               })}
         </div>
       </div>

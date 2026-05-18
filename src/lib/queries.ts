@@ -35,4 +35,6 @@ export const queryKeys = {
   adminTopProducts: ["adminTopProducts"] as const,
   adminRecentOrders: ["adminRecentOrders"] as const,
   adminLowStock: ["adminLowStock"] as const,
+  heroSlides: ["heroSlides"] as const,
+  adminHeroSlides: ["adminHeroSlides"] as const,
 };

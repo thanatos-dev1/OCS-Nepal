@@ -4,6 +4,7 @@ import { useState } from "react";
 import { X } from "lucide-react";
 import Button from "@/components/ui/Button";
 import Input from "@/components/ui/Input";
+import CategoryCoverUploader from "@/components/admin/CategoryCoverUploader";
 import type { Category } from "@/lib/api/types";
 import type { CategoryInput } from "@/lib/api/categories";
 
@@ -19,6 +20,7 @@ export default function CategoryModal({ initial, categories = [], onSave, onClos
   const [description, setDescription] = useState(initial?.description ?? "");
   const [parentId, setParentId] = useState<string>(initial?.parentId ?? "");
   const [showInBar, setShowInBar] = useState(initial?.showInBar ?? false);
+  const [showOnHomepage, setShowOnHomepage] = useState(initial?.showOnHomepage ?? false);
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
 
@@ -30,10 +32,11 @@ export default function CategoryModal({ initial, categories = [], onSave, onClos
     setLoading(true);
     try {
       await onSave({
-        Name: name.trim(),
-        ShowInBar: showInBar,
-        Description: description.trim() || undefined,
-        ParentID: parentId ? parseInt(parentId, 10) : null,
+        name: name.trim(),
+        show_in_bar: showInBar,
+        show_on_homepage: showOnHomepage,
+        description: description.trim() || undefined,
+        parent_id: parentId ? parseInt(parentId, 10) : null,
       });
       onClose();
     } catch (err: unknown) {
@@ -104,6 +107,28 @@ export default function CategoryModal({ initial, categories = [], onSave, onClos
             />
             <span className="text-sm font-medium text-text">Show in category bar</span>
           </label>
+
+          <label className="flex items-center gap-3 cursor-pointer select-none">
+            <input
+              type="checkbox"
+              checked={showOnHomepage}
+              onChange={(e) => setShowOnHomepage(e.target.checked)}
+              className="w-4 h-4 rounded border-border accent-accent"
+            />
+            <span className="text-sm font-medium text-text">Show as a row on the homepage</span>
+          </label>
+
+          {initial && (
+            <CategoryCoverUploader
+              categoryId={parseInt(initial.id, 10)}
+              currentUrl={initial.coverImageUrl}
+            />
+          )}
+          {!initial && (
+            <p className="text-xs text-text-muted">
+              Save the category first to upload a cover image.
+            </p>
+          )}
 
           <div className="flex justify-end gap-3 pt-1">
             <Button type="button" variant="outline" size="sm" onClick={onClose} disabled={loading}>

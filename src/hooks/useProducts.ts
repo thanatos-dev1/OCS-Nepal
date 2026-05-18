@@ -8,11 +8,13 @@ import {
   deleteProduct,
   updateProductSpecs,
   updateProductSpecExtras,
+  uploadProductImage,
+  deleteProductImage,
+  setPrimaryImage,
   type ProductsParams,
   type SpecInput,
   type SpecExtraInput,
 } from "@/lib/api/products";
-import { uploadImage } from "@/lib/api/upload";
 import { queryKeys } from "@/lib/queries";
 import type { Product } from "@/lib/api/types";
 
@@ -51,11 +53,8 @@ export function useSaveProductMutation(editingProduct: Product | null) {
 
       if (editingProduct) {
         savedId = parseInt(editingProduct.id, 10);
-        const imageFile = form.get("image");
-        let imageUrl = (form.get("image_url") as string) || undefined;
-        if (imageFile instanceof File && imageFile.size > 0) {
-          imageUrl = await uploadImage(imageFile);
-        }
+        // Image management for existing products goes through ProductImageGallery —
+        // no image fields are sent on this update.
         await updateProduct(savedId, {
           Name: form.get("name") as string,
           Price: parseFloat(form.get("price") as string),
@@ -63,6 +62,7 @@ export function useSaveProductMutation(editingProduct: Product | null) {
           Description: (form.get("description") as string) || undefined,
           BrandID: form.get("brand_id") ? parseInt(form.get("brand_id") as string, 10) : undefined,
           Brand: (form.get("brand") as string) || undefined,
+          SeriesID: form.get("series_id") ? parseInt(form.get("series_id") as string, 10) : undefined,
           CategoryID: form.get("category_id") ? parseInt(form.get("category_id") as string, 10) : undefined,
           IsFeatured: form.get("is_featured") === "true",
           IsNewArrival: form.get("is_new_arrival") === "true",
@@ -79,6 +79,7 @@ export function useSaveProductMutation(editingProduct: Product | null) {
               Description: (form.get("description") as string) || undefined,
               BrandID: form.get("brand_id") ? parseInt(form.get("brand_id") as string, 10) : undefined,
               Brand: (form.get("brand") as string) || undefined,
+              SeriesID: form.get("series_id") ? parseInt(form.get("series_id") as string, 10) : undefined,
               CategoryID: form.get("category_id") ? parseInt(form.get("category_id") as string, 10) : undefined,
             });
         savedId = parseInt(created.id, 10);
@@ -108,6 +109,44 @@ export function useDeleteProductMutation() {
   const qc = useQueryClient();
   return useMutation({
     mutationFn: (id: number) => deleteProduct(id),
+    onSuccess: () => qc.invalidateQueries({ queryKey: queryKeys.products }),
+  });
+}
+
+// --- Product image mutations ---
+
+// Upload one or many image files for a product. Runs in parallel and
+// reports per-file results so the UI can show a "N of M succeeded" summary.
+export function useUploadProductImagesMutation(productId: number) {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: async (files: File[]) => {
+      const results = await Promise.allSettled(
+        files.map((file) => {
+          const form = new FormData();
+          form.append("image", file);
+          return uploadProductImage(productId, form);
+        }),
+      );
+      const succeeded = results.filter((r) => r.status === "fulfilled").length;
+      return { succeeded, failed: results.length - succeeded };
+    },
+    onSuccess: () => qc.invalidateQueries({ queryKey: queryKeys.products }),
+  });
+}
+
+export function useDeleteProductImageMutation(productId: number) {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: (imageId: number) => deleteProductImage(productId, imageId),
+    onSuccess: () => qc.invalidateQueries({ queryKey: queryKeys.products }),
+  });
+}
+
+export function useSetPrimaryImageMutation(productId: number) {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: (imageId: number) => setPrimaryImage(productId, imageId),
     onSuccess: () => qc.invalidateQueries({ queryKey: queryKeys.products }),
   });
 }

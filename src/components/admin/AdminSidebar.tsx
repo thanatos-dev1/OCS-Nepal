@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
-import { LayoutGrid, Tag, LogOut, Package, Percent, Ticket, Users, Boxes, BadgeCheck } from "lucide-react";
+import { LayoutGrid, Tag, LogOut, Package, Percent, Ticket, Users, Boxes, BadgeCheck, Images, Type } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useAuthStore } from "@/stores/authStore";
 import { logout } from "@/lib/api/auth";
@@ -16,6 +16,8 @@ const nav = [
   { label: "Coupons", href: "/dashboard/coupons", icon: Ticket },
   { label: "Orders", href: "/dashboard/orders", icon: Package },
   { label: "Customers", href: "/dashboard/customers", icon: Users },
+  { label: "Hero Slides", href: "/dashboard/hero-slides", icon: Images },
+  { label: "Hero Content", href: "/dashboard/hero-content", icon: Type },
 ];
 
 export default function AdminSidebar() {

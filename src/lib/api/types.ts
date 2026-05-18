@@ -19,6 +19,8 @@ export type Category = {
   parentId: string | null;
   productCount: number;
   showInBar: boolean;
+  showOnHomepage: boolean;
+  coverImageUrl: string;
 };
 
 export type BrandSeries = {
@@ -79,6 +81,7 @@ export type Product = {
   lowStockThreshold: number;
   brand?: string;
   brandId?: string;
+  seriesId?: string;
   badge?: string;
   description: string;
   specs: ProductSpec[];

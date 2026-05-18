@@ -6,8 +6,10 @@ import Button from "@/components/ui/Button";
 import Input from "@/components/ui/Input";
 import SpecValuesEditor from "@/components/admin/SpecValuesEditor";
 import SpecExtrasEditor, { type ExtraRow } from "@/components/admin/SpecExtrasEditor";
+import ProductImageGallery from "@/components/admin/ProductImageGallery";
 import { useCategorySpecDefinitionsQuery } from "@/hooks/useSpecDefinitions";
 import { useBrandsQuery } from "@/hooks/useBrands";
+import { useSeriesByBrandQuery } from "@/hooks/useSeries";
 import type { SpecInput, SpecExtraInput } from "@/lib/api/products";
 import type { Category, Product } from "@/lib/api/types";
 
@@ -18,7 +20,7 @@ interface Props {
   onClose: () => void;
 }
 
-type FieldErrors = Partial<Record<"name" | "price" | "stock", string>>;
+type FieldErrors = Partial<Record<"name" | "price" | "stock" | "category", string>>;
 
 export default function ProductModal({ initial, categories, onSave, onClose }: Props) {
   const [name, setName] = useState(initial?.name ?? "");
@@ -26,6 +28,7 @@ export default function ProductModal({ initial, categories, onSave, onClose }: P
   const [stock, setStock] = useState(initial ? String(initial.stockCount) : "");
   const [description, setDescription] = useState(initial?.description ?? "");
   const [brandId, setBrandId] = useState(initial?.brandId ?? "");
+  const [seriesId, setSeriesId] = useState(initial?.seriesId ?? "");
   const [categoryId, setCategoryId] = useState(initial?.categoryId ?? "");
   const [isFeatured, setIsFeatured] = useState(initial?.isFeatured ?? false);
   const [isNewArrival, setIsNewArrival] = useState(initial?.isNewArrival ?? false);
@@ -59,6 +62,16 @@ export default function ProductModal({ initial, categories, onSave, onClose }: P
 
   const { data: specDefinitions = [] } = useCategorySpecDefinitionsQuery(categorySlug);
   const { data: brands = [] } = useBrandsQuery();
+  const { data: brandSeries = [] } = useSeriesByBrandQuery(brandId ? parseInt(brandId, 10) : null);
+
+  // When the brand changes, clear the series — series belongs to one brand,
+  // and the previously-selected one no longer applies. Skip on the very first
+  // render so editing a product with a brand+series doesn't immediately wipe.
+  const initialBrand = initial?.brandId ?? "";
+  useEffect(() => {
+    if (brandId !== initialBrand) setSeriesId("");
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [brandId]);
 
   // When the category changes during editing, drop any spec values whose
   // definition no longer belongs to the new category — they'd be rejected by
@@ -99,6 +112,7 @@ export default function ProductModal({ initial, categories, onSave, onClose }: P
     }
     const s = parseInt(stock, 10);
     if (stock && (isNaN(s) || s < 0)) errs.stock = "Must be 0 or more";
+    if (!categoryId) errs.category = "Required";
     setErrors(errs);
 
     const sErrs: Record<string, string> = {};
@@ -150,6 +164,7 @@ export default function ProductModal({ initial, categories, onSave, onClose }: P
     if (stock) form.append("stock", stock);
     if (description.trim()) form.append("description", description.trim());
     if (brandId) form.append("brand_id", brandId);
+    if (seriesId) form.append("series_id", seriesId);
     if (categoryId) form.append("category_id", categoryId);
     form.append("is_featured", String(isFeatured));
     form.append("is_new_arrival", String(isNewArrival));
@@ -184,26 +199,35 @@ export default function ProductModal({ initial, categories, onSave, onClose }: P
 
         {/* Body */}
         <form id="product-form" onSubmit={handleSubmit} className="overflow-y-auto px-6 py-5 flex flex-col gap-4">
-          {/* Image upload */}
-          <div>
-            <span className="text-sm font-medium text-text block mb-1.5">Image</span>
-            <button
-              type="button"
-              onClick={() => fileRef.current?.click()}
-              className="w-full h-36 rounded-lg border-2 border-dashed border-border hover:border-accent transition-colors flex flex-col items-center justify-center gap-2 overflow-hidden relative"
-            >
-              {imagePreview ? (
-                // eslint-disable-next-line @next/next/no-img-element
-                <img src={imagePreview} alt="preview" className="absolute inset-0 w-full h-full object-contain p-2" />
-              ) : (
-                <>
-                  <ImagePlus size={24} className="text-text-muted" />
-                  <span className="text-sm text-text-muted">Click to upload image</span>
-                </>
-              )}
-            </button>
-            <input ref={fileRef} type="file" accept="image/*" className="hidden" onChange={handleFile} />
-          </div>
+          {/* Images: new product gets a single-image picker (no ID yet for gallery uploads);
+              existing product gets the full gallery. */}
+          {initial ? (
+            <ProductImageGallery
+              productId={parseInt(initial.id, 10)}
+              images={initial.images}
+            />
+          ) : (
+            <div>
+              <span className="text-sm font-medium text-text block mb-1.5">Image</span>
+              <button
+                type="button"
+                onClick={() => fileRef.current?.click()}
+                className="w-full h-36 rounded-lg border-2 border-dashed border-border hover:border-accent transition-colors flex flex-col items-center justify-center gap-2 overflow-hidden relative"
+              >
+                {imagePreview ? (
+                  // eslint-disable-next-line @next/next/no-img-element
+                  <img src={imagePreview} alt="preview" className="absolute inset-0 w-full h-full object-contain p-2" />
+                ) : (
+                  <>
+                    <ImagePlus size={24} className="text-text-muted" />
+                    <span className="text-sm text-text-muted">Click to upload image</span>
+                  </>
+                )}
+              </button>
+              <input ref={fileRef} type="file" accept="image/*" className="hidden" onChange={handleFile} />
+              <p className="mt-1.5 text-xs text-text-muted">More images can be added after saving.</p>
+            </div>
+          )}
 
           <Input id="p-name" label="Name" value={name} onChange={(e) => { setName(e.target.value); setErrors((prev) => ({ ...prev, name: undefined })); }} error={errors.name} placeholder="RTX 4090" />
 
@@ -238,19 +262,37 @@ export default function ProductModal({ initial, categories, onSave, onClose }: P
             </select>
           </div>
 
+          {brandId && brandSeries.length > 0 && (
+            <div className="flex flex-col gap-1.5">
+              <label htmlFor="p-series" className="text-sm font-medium text-text">Series (optional)</label>
+              <select
+                id="p-series"
+                value={seriesId}
+                onChange={(e) => setSeriesId(e.target.value)}
+                className="w-full rounded-md border border-border bg-bg px-3.5 py-2.5 text-sm text-text focus:outline-none focus:ring-2 focus:ring-accent focus:ring-offset-1 hover:border-border-strong transition-colors"
+              >
+                <option value="">— None —</option>
+                {brandSeries.map((s) => (
+                  <option key={s.id} value={s.id}>{s.name}</option>
+                ))}
+              </select>
+            </div>
+          )}
+
           <div className="flex flex-col gap-1.5">
             <label htmlFor="p-category" className="text-sm font-medium text-text">Category</label>
             <select
               id="p-category"
               value={categoryId}
-              onChange={(e) => setCategoryId(e.target.value)}
+              onChange={(e) => { setCategoryId(e.target.value); setErrors((prev) => ({ ...prev, category: undefined })); }}
               className="w-full rounded-md border border-border bg-bg px-3.5 py-2.5 text-sm text-text focus:outline-none focus:ring-2 focus:ring-accent focus:ring-offset-1 hover:border-border-strong transition-colors"
             >
-              <option value="">— None —</option>
+              <option value="">— Select a category —</option>
               {categories.map((c) => (
                 <option key={c.id} value={c.id}>{c.name}</option>
               ))}
             </select>
+            {errors.category && <p className="text-sm text-error">{errors.category}</p>}
           </div>
 
           <div className="flex flex-col gap-2">

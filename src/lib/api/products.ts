@@ -105,6 +105,7 @@ export type ProductInput = {
   Stock?: number;
   Brand?: string;
   BrandID?: number;
+  SeriesID?: number;
   CategoryID?: number;
   IsFeatured?: boolean;
   IsNewArrival?: boolean;
@@ -148,6 +149,9 @@ export function adaptProduct(p: ApiProduct): Product {
           : (typeof p.BrandRef === "object" && p.BrandRef?.ID
               ? String(p.BrandRef.ID)
               : undefined)),
+    seriesId: p.SeriesID != null
+      ? String(p.SeriesID)
+      : (p.series_id != null ? String(p.series_id) : undefined),
     description: p.Description ?? p.description ?? "",
     images,
     inStock: p.InStock ?? p.in_stock ?? stock > 0,

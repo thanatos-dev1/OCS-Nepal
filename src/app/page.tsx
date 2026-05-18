@@ -1,12 +1,11 @@
 export const dynamic = "force-dynamic";
 
 import Hero from "@/components/shop/Hero";
-import BrandsStrip from "@/components/shop/BrandsStrip";
-import NewArrivals from "@/components/shop/NewArrivals";
-import FeaturedProducts from "@/components/shop/FeaturedProducts";
-import DealsSection from "@/components/shop/DealsSection";
-import BudgetPicks from "@/components/shop/BudgetPicks";
 import CategoryGrid from "@/components/shop/CategoryGrid";
+import DealsSection from "@/components/shop/DealsSection";
+import FeaturedProducts from "@/components/shop/FeaturedProducts";
+import BudgetPicks from "@/components/shop/BudgetPicks";
+import FeaturedCategoryRows from "@/components/shop/FeaturedCategoryRows";
 import ShopByBrand from "@/components/shop/ShopByBrand";
 import RecentlyViewed from "@/components/shop/RecentlyViewed";
 
@@ -14,12 +13,11 @@ export default function HomePage() {
   return (
     <>
       <Hero />
-      <BrandsStrip />
+      <CategoryGrid />
       <DealsSection />
-      <NewArrivals />
       <FeaturedProducts />
       <BudgetPicks />
-      <CategoryGrid />
+      <FeaturedCategoryRows />
       <ShopByBrand />
       <RecentlyViewed />
     </>
